@@ -1,4 +1,4 @@
-export default function LoginLayout({
+export default async function LoginLayout({
   children, // will be a page or nested layout
 }) {
   return (

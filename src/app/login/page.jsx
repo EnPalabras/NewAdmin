@@ -1,11 +1,16 @@
 'use client'
 import { useState } from 'react'
+import { signIn } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 
-const Login = ({ setAuth }) => {
+export default function Login() {
   const [inputs, setInputs] = useState({
     email: '',
     password: '',
   })
+  const router = useRouter()
+  const [error, setError] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const { email, password } = inputs
 
@@ -14,32 +19,29 @@ const Login = ({ setAuth }) => {
 
   const onSubmitForm = async (e) => {
     e.preventDefault()
+    setError(false)
+    setLoading(true)
     try {
-      console.log({ email, password })
-      const body = { email, password }
-      const response = await fetch(
-        'https://serverep-production.up.railway.app/api/auth/login',
-        {
-          method: 'POST',
-          headers: {
-            'Content-type': 'application/json',
-          },
-          body: JSON.stringify(body),
-        }
-      )
+      const result = await signIn('credentials', {
+        redirect: false,
+        email,
+        password,
+      })
 
-      const parseRes = await response.json()
-      console.log(parseRes)
-
-      if (parseRes.token) {
-        localStorage.setItem('token', parseRes.token)
-        localStorage.setItem('user', JSON.stringify(parseRes.user))
-        setAuth(true)
-      } else {
-        setAuth(false)
+      if (result.error === null) {
+        router.push('/')
+      }
+      const error = JSON.parse(result.error)
+      if (error.status && error.status === 401) {
+        setError(true)
       }
     } catch (err) {
       console.error(err.message)
+      setTimeout(() => {
+        setError(true)
+      }, 1000)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -99,12 +101,23 @@ const Login = ({ setAuth }) => {
                 />
               </div>
 
-              <button
-                type="submit"
-                className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-              >
-                Ingresar
-              </button>
+              {loading ? (
+                <button
+                  type="submit"
+                  className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                  disabled
+                >
+                  Cargando...
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                >
+                  Ingresar
+                </button>
+              )}
+
               <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                 ¿No tienes cuenta?{' '}
                 <a
@@ -114,6 +127,37 @@ const Login = ({ setAuth }) => {
                   Registrarme
                 </a>
               </p>
+              {error && (
+                <div
+                  className="flex p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400"
+                  role="alert"
+                >
+                  <svg
+                    aria-hidden="true"
+                    className="flex-shrink-0 inline w-5 h-5 mr-3"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                      clipRule="evenodd"
+                    ></path>
+                  </svg>
+
+                  <span className="sr-only">Danger</span>
+                  <div>
+                    <span className="font-medium">
+                      No se pudo iniciar sesión:
+                    </span>
+                    <ul className="mt-1.5 ml-4 list-disc list-inside">
+                      <li>Compruebe email y contraseña</li>
+                      <li>De aviso si el problema persiste</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
             </form>
           </div>
         </div>
@@ -121,5 +165,3 @@ const Login = ({ setAuth }) => {
     </section>
   )
 }
-
-export default Login

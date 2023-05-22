@@ -1,8 +1,9 @@
 'use client'
 import Link from 'next/link'
 import { useState } from 'react'
+import { signIn } from 'next-auth/react'
 
-export default function Page() {
+export default function Register() {
   const [inputs, setInputs] = useState({
     name: '',
     email: '',
@@ -11,6 +12,7 @@ export default function Page() {
   })
 
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(false)
 
   const { name, email, password, password2 } = inputs
 
@@ -20,12 +22,12 @@ export default function Page() {
   const onSubmitForm = async (e) => {
     e.preventDefault()
     setLoading(true)
-    if (password !== password2) {
-      return alert('Passwords do not match')
-    }
+    setError(false)
     try {
+      if (password !== password2) {
+        return setError(true)
+      }
       const body = { name, email, password }
-      console.log(body)
       const response = await fetch(
         'https://serverep-production.up.railway.app/api/auth/register',
         {
@@ -37,34 +39,25 @@ export default function Page() {
         }
       )
 
-      const parseRes = await response.json()
-      if (parseRes.token) {
-        localStorage.setItem('token', parseRes.token)
-        localStorage.setItem('user', JSON.stringify(parseRes.user))
-        setAuth(true)
+      if (response.status === 201) {
+        const result = await signIn('credentials', {
+          redirect: true,
+          email,
+          password,
+        })
       } else {
-        setAuth(false)
+        setError(true)
       }
     } catch (err) {
       console.error(err.message)
+      setError(true)
     } finally {
       setLoading(false)
     }
   }
   return (
-    <section className="bg-gray-50 dark:bg-gray-900">
+    <section className="bg-gray-50 dark:bg-gray-900 h-0">
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-        {/* <a
-          href="#"
-          className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white"
-        >
-          <img
-            className="w-8 h-8 mr-2"
-            src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/logo.svg"
-            alt="logo"
-          />
-          Flowbite
-        </a> */}
         <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
@@ -168,6 +161,39 @@ export default function Page() {
                   Ingresa
                 </Link>
               </p>
+
+              {error && (
+                <div
+                  class="flex p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400"
+                  role="alert"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="flex-shrink-0 inline w-5 h-5 mr-3"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                      clip-rule="evenodd"
+                    ></path>
+                  </svg>
+
+                  <span class="sr-only">Danger</span>
+                  <div>
+                    <span class="font-medium">
+                      Ocurrió un error al crear la cuenta:
+                    </span>
+                    <ul class="mt-1.5 ml-4 list-disc list-inside">
+                      <li>Compruebe que las contraseñas coincidan</li>
+                      <li>Confirme si ya tiene una cuenta</li>
+                      <li>De aviso si el problema persiste</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
             </form>
           </div>
         </div>
