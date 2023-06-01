@@ -1,10 +1,13 @@
+import SalesTable from '@/components/SalesTable'
 import Sidebar from '@/components/Sidebar'
-import Script from 'next/script'
 
 export default function Home() {
   return (
     <>
-      <Sidebar />{' '}
+      <Sidebar />
+      <main className="md:ml-64  mt-10 lg:mt-4">
+        <SalesTable />
+      </main>
     </>
   )
 }
