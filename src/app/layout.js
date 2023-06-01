@@ -1,7 +1,6 @@
 import UserProvider from '@/Providers/UserProvider'
 import './globals.css'
 import { Inter } from 'next/font/google'
-import Script from 'next/script'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -15,6 +14,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={inter.className}>
         <UserProvider>{children}</UserProvider>
+
         {/* <Script
           strategy="beforeInteractive"
           id="flowbite-bundle"

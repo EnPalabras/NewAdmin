@@ -31,7 +31,7 @@ export default function Aside({ showSidebar }) {
             <li>
               <Link
                 href="/"
-                className="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100  group"
+                className="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg  hover:bg-gray-100 dark:text-gray-400 dark:text-white dark:hover:bg-gray-600 group"
               >
                 <svg
                   aria-hidden="true"
@@ -53,7 +53,7 @@ export default function Aside({ showSidebar }) {
                 id="dash-button"
                 name="dash"
                 onClick={() => toggleDash('dash')}
-                className="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white border-none focus:border-none focus:outline-none"
+                className="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-gray-400 dark:text-white dark:hover:bg-gray-600 border-none "
                 aria-controls="dropdown-dashboard"
                 data-collapse-toggle="dropdown-dashboard"
               >
@@ -92,7 +92,7 @@ export default function Aside({ showSidebar }) {
                 <li>
                   <a
                     href="#"
-                    className="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white "
+                    className="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-gray-400 dark:text-white dark:hover:bg-gray-600 "
                   >
                     Settings
                   </a>
@@ -100,7 +100,7 @@ export default function Aside({ showSidebar }) {
                 <li>
                   <a
                     href="#"
-                    className="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white "
+                    className="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-gray-400 dark:text-white dark:hover:bg-gray-600 "
                   >
                     Kanban
                   </a>
@@ -108,7 +108,7 @@ export default function Aside({ showSidebar }) {
                 <li>
                   <a
                     href="#"
-                    className="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white "
+                    className="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-gray-400 dark:text-white dark:hover:bg-gray-600 "
                   >
                     Calendar
                   </a>
@@ -120,7 +120,7 @@ export default function Aside({ showSidebar }) {
                 type="button"
                 id="sales-button"
                 onClick={() => toggleDash('sales')}
-                className="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white border-none focus:border-none focus:outline-none"
+                className="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-gray-400 dark:text-white dark:hover:bg-gray-600 border-none "
                 aria-controls="dropdown-sales"
                 data-collapse-toggle="dropdown-sales"
               >
@@ -161,7 +161,7 @@ export default function Aside({ showSidebar }) {
                 <li>
                   <a
                     href="#"
-                    className="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white "
+                    className="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-gray-400 dark:text-white dark:hover:bg-gray-600 "
                   >
                     Ver todas
                   </a>
@@ -169,7 +169,7 @@ export default function Aside({ showSidebar }) {
                 <li>
                   <a
                     href="#"
-                    className="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white "
+                    className="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-gray-400 dark:text-white dark:hover:bg-gray-600 "
                   >
                     Tienda Nube
                   </a>
@@ -177,7 +177,7 @@ export default function Aside({ showSidebar }) {
                 <li>
                   <a
                     href="#"
-                    className="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white "
+                    className="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-gray-400 dark:text-white dark:hover:bg-gray-600 "
                   >
                     Mercado Libre
                   </a>
@@ -187,7 +187,7 @@ export default function Aside({ showSidebar }) {
             <li>
               <a
                 href="#"
-                className="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100  group"
+                className="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-gray-400 dark:text-white dark:hover:bg-gray-600  group"
               >
                 <svg
                   aria-hidden="true"
@@ -212,7 +212,7 @@ export default function Aside({ showSidebar }) {
                 type="button"
                 id="upload-button"
                 onClick={() => toggleDash('upload')}
-                className="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white border-none focus:border-none focus:outline-none"
+                className="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-gray-400 dark:text-white dark:hover:bg-gray-600 border-none "
                 aria-controls="dropdown-upload"
                 data-collapse-toggle="dropdown-upload"
               >
@@ -253,7 +253,7 @@ export default function Aside({ showSidebar }) {
                 <li>
                   <Link
                     href="/cargar/reventa"
-                    className="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white "
+                    className="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-gray-400 dark:text-white dark:hover:bg-gray-600 "
                   >
                     Reventa
                   </Link>
@@ -261,7 +261,7 @@ export default function Aside({ showSidebar }) {
                 <li>
                   <a
                     href="#"
-                    className="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white "
+                    className="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-gray-400 dark:text-white dark:hover:bg-gray-600 "
                   >
                     Regalo
                   </a>
@@ -269,7 +269,7 @@ export default function Aside({ showSidebar }) {
                 <li>
                   <a
                     href="#"
-                    className="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white "
+                    className="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-gray-400 dark:text-white dark:hover:bg-gray-600 "
                   >
                     Personal
                   </a>
@@ -281,7 +281,7 @@ export default function Aside({ showSidebar }) {
             <li>
               <a
                 href="#"
-                className="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100  dark:text-white group"
+                className="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 dark:text-gray-400 dark:text-white dark:hover:bg-gray-600 group"
               >
                 <svg
                   aria-hidden="true"
@@ -303,7 +303,7 @@ export default function Aside({ showSidebar }) {
             <li>
               <a
                 href="#"
-                className="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100  dark:text-white group"
+                className="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 dark:text-gray-400 dark:text-white dark:hover:bg-gray-600 group"
               >
                 <svg
                   aria-hidden="true"
@@ -321,7 +321,7 @@ export default function Aside({ showSidebar }) {
             {/* <li>
             <a
               href="#"
-              className="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100  dark:text-white group"
+              className="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 dark:text-gray-400 dark:text-white dark:hover:bg-gray-600 group"
             >
               <svg
                 aria-hidden="true"
@@ -343,7 +343,7 @@ export default function Aside({ showSidebar }) {
             <li>
               <a
                 href="#"
-                className="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100  dark:text-white group"
+                className="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 dark:text-gray-400 dark:text-white dark:hover:bg-gray-600 group"
               >
                 <svg
                   aria-hidden="true"

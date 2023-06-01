@@ -9,7 +9,7 @@ export default function Apps({ isDropdownOpen, setIsDropdownOpen }) {
         type="button"
         onClick={setIsDropdownOpen}
         data-dropdown-toggle="apps-dropdown"
-        className="p-2 text-gray-500 rounded-lg hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white  border-none focus:border-none focus:outline-none"
+        className="p-2 text-gray-500 rounded-lg dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-600  border-none"
       >
         <span className="sr-only">View notifications</span>
         <svg
