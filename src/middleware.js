@@ -23,7 +23,6 @@ export async function middleware(request) {
   }
 
   if (pathname !== '/login' && pathname !== '/register') {
-    console.log('entro')
     if (!token) {
       const url = new URL(`/login`, request.url)
       return NextResponse.redirect(url)
@@ -35,5 +34,5 @@ export async function middleware(request) {
 
 // Falta agregar el middleware para proteger rutas
 export const config = {
-  matcher: ['/login/:path*', '/register/:path*'],
+  matcher: ['/login/:path*', '/register/:path*', '/'],
 }

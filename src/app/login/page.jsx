@@ -29,7 +29,7 @@ export default function Login() {
       })
 
       if (result.error === null) {
-        router.push('/')
+        window.location.href = '/'
       }
       const error = JSON.parse(result.error)
       if (error.status && error.status === 401) {
