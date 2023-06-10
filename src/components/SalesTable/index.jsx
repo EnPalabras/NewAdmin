@@ -1,4 +1,5 @@
 'use client'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 
@@ -46,12 +47,12 @@ export const TableHeader = () => {
         </div>
       </form>
 
-      <button
-        type="button"
+      <Link
+        href="/cargar"
         class="flex items-center mx-2 w-full max-w-[150px] justify-center px-4 py-4 text-sm font-medium text-white rounded-lg bg-primary-700 hover:bg-primary-800 dark:bg-primary-600 dark:hover:bg-primary-700"
       >
         Agregar Venta
-      </button>
+      </Link>
     </div>
   )
 }
@@ -84,7 +85,6 @@ export default function SalesTable() {
   const { salesData, error, isLoading } = useSalesData(pagination)
 
   if (error) return <div>failed to load</div>
-  if (isLoading) return <div>loading...</div>
 
   return (
     <section class="mx-auto py-2">
@@ -98,10 +98,10 @@ export default function SalesTable() {
                   <th scope="col" class="hidden xl:table-cell px-4 py-3">
                     Fecha
                   </th>
-                  <th scope="col" class="px-4 py-3">
+                  <th scope="col" class="px-4 py-3 ">
                     Canal
                   </th>
-                  <th scope="col" class="px-4 py-3">
+                  <th scope="col" class="px-4 py-3 hidden xl:table-cell">
                     Estado
                   </th>
                   <th scope="col" class="px-4 py-3">
@@ -111,7 +111,7 @@ export default function SalesTable() {
                     Nombre
                   </th>
                   <th scope="col" class="hidden xl:table-cell px-4 py-3">
-                    Tipo Pago
+                    Productos
                   </th>
                   <th scope="col" class="hidden xl:table-cell px-4 py-3">
                     Tipo Envío
@@ -123,6 +123,40 @@ export default function SalesTable() {
                 </tr>
               </thead>
               <tbody>
+                {isLoading &&
+                  [...Array(20)].map((_, index) => {
+                    return (
+                      <tr
+                        key={index}
+                        class="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      >
+                        <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white ">
+                          <p class="leading-relaxed h-5 animate-pulse bg-gray-400 border-radius-20 rounded"></p>
+                        </td>
+                        <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white ">
+                          <p class="leading-relaxed h-5 animate-pulse bg-gray-400 border-radius-20 rounded"></p>
+                        </td>
+                        <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white ">
+                          <p class="leading-relaxed h-5 animate-pulse bg-gray-400 border-radius-20 rounded"></p>
+                        </td>
+                        <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white ">
+                          <p class="leading-relaxed h-5 animate-pulse bg-gray-400 border-radius-20 rounded"></p>
+                        </td>
+                        <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white hidden xl:table-cell">
+                          <p class="leading-relaxed h-5 animate-pulse bg-gray-400 border-radius-20 rounded"></p>
+                        </td>
+                        <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white hidden xl:table-cell">
+                          <p class="leading-relaxed h-5 animate-pulse bg-gray-400 border-radius-20 rounded"></p>
+                        </td>
+                        <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white hidden xl:table-cell">
+                          <p class="leading-relaxed h-5 animate-pulse bg-gray-400 border-radius-20 rounded"></p>
+                        </td>
+                        <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white hidden xl:table-cell">
+                          <p class="leading-relaxed h-5 animate-pulse bg-gray-400 border-radius-20 rounded"></p>
+                        </td>
+                      </tr>
+                    )
+                  })}
                 {salesData.orders.map((sale) => {
                   return (
                     <tr
@@ -138,6 +172,7 @@ export default function SalesTable() {
                           }
                         </div>
                       </td>
+
                       <td class="px-4 py-2">
                         {}
                         <span
@@ -148,7 +183,7 @@ export default function SalesTable() {
                           {sale.canalVenta}
                         </span>
                       </td>
-                      <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                      <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white hidden xl:table-cell">
                         <div class="flex items-center">{sale.estado}</div>
                       </td>
                       <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
@@ -156,7 +191,7 @@ export default function SalesTable() {
                       </td>
 
                       <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                        {sale.nombre}
+                        {sale.nombre.split(' ', 3).join(' ')}
                       </td>
                       <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white hidden xl:table-cell">
                         <span class="text-gray-500 dark:text-gray-400">
@@ -171,13 +206,21 @@ export default function SalesTable() {
                         </div>
                       </td>
 
-                      <td class="px-4 py-2 flex justify-between">
+                      <td
+                        class="px-4 py-4 flex justify-between items-end whitespace-nowrap font-semibold 
+                      "
+                      >
                         <p>$</p>
-                        <span className="font-semibold text-right">
-                          {sale.Payments.reduce((acc, payment) => {
-                            return (acc + payment.montoTotal).toLocaleString()
-                          }, 0)}
-                        </span>
+                        {sale.Payments.reduce((acc, payment) => {
+                          return (acc + payment.montoTotal).toLocaleString(
+                            'es-AR',
+                            {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                              maximumSignificantDigits: 3,
+                            }
+                          )
+                        }, 0)}
                       </td>
                       <td class="px-2 py-1">
                         <button
