@@ -258,9 +258,9 @@ export default function SalesTable() {
                 ]
                   .filter((page) => page > 0)
                   .slice(0, 5)
-                  .map((page) => {
+                  .map((page, index) => {
                     return (
-                      <li>
+                      <li key={index}>
                         <a
                           onClick={() => setPagination(page)}
                           className={
