@@ -279,8 +279,8 @@ export default function Aside({ showSidebar }) {
           </ul>
           <ul className="pt-5 mt-5 space-y-2 border-t border-gray-200 dark:border-gray-700">
             <li>
-              <a
-                href="#"
+              <Link
+                href="/ventas/editar"
                 className="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 dark:text-gray-400 dark:text-white dark:hover:bg-gray-600 group"
               >
                 <svg
@@ -298,7 +298,7 @@ export default function Aside({ showSidebar }) {
                   ></path>
                 </svg>
                 <span className="ml-3">Editar Ventas</span>
-              </a>
+              </Link>
             </li>
             <li>
               <Link

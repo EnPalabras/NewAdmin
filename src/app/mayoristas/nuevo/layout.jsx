@@ -1,7 +1,7 @@
 import Sidebar from '@/components/Sidebar'
 import Script from 'next/script'
 
-export default async function Mayoristas({
+export default async function CargarMayorista({
   children, // will be a page or nested layout
 }) {
   return (
