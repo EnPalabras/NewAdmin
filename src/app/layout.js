@@ -12,15 +12,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <UserProvider>{children}</UserProvider>
-
-        {/* <Script
-          strategy="beforeInteractive"
-          id="flowbite-bundle"
-          src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.4/flowbite.min.js"
-        /> */}
-      </body>
+      <UserProvider>
+        <body className={inter.className}>{children}</body>
+      </UserProvider>
     </html>
   )
 }
