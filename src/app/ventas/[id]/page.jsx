@@ -119,6 +119,55 @@ const StatusInfo = ({ estado }) => {
   )
 }
 
+const ShipmentInfo = ({ estado }) => {
+  const statusColor = {
+    'Pendiente Envío': {
+      color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+      circle: 'bg-blue-500',
+    },
+
+    'Pendiente Pago': {
+      color:
+        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+      circle: 'bg-yellow-500',
+    },
+    Finalizada: {
+      color:
+        'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+      circle: 'bg-green-500',
+    },
+    Abierta: {
+      color:
+        'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+      circle: 'bg-green-500',
+    },
+    shipped: {
+      color:
+        'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+      circle: 'bg-green-500',
+    },
+    Pendiente: {
+      color: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
+      circle: 'bg-red-500',
+    },
+  }
+
+  return (
+    <span
+      className={`inline-flex items-center bg-gray-100 text-gray-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-gray-900 dark:text-gray-300
+        ${statusColor[estado] && statusColor[estado].color}
+      `}
+    >
+      <span
+        className={`w-2 h-2 mr-1 bg-gray-500 rounded-full
+        ${statusColor[estado] && statusColor[estado].circle}
+      `}
+      ></span>
+      {estado}
+    </span>
+  )
+}
+
 export default function Page({ params }) {
   const data = use(getData(params.id))
 
@@ -150,7 +199,7 @@ export default function Page({ params }) {
         </div>
         <div className="flex flex-row mt-6 pb-4 border-b ">
           <span className="text-gray-500">Fecha de venta: </span>
-          <span className="text-gray-900 ml-2">
+          <span className="text-gray-900 ml-2 dark:text-gray-200">
             {' '}
             {new Date(data.order.fechaCreada).toLocaleDateString()}
           </span>
@@ -160,30 +209,200 @@ export default function Page({ params }) {
 
         {data.order.Products.map((product) => {
           return (
-            <div className="flex flex-row justify-between items-center mt-10  mx-auto">
-              <div className="flex h-full flex-row items-center">
-                <img
-                  src={ProductImage[product.producto]}
-                  className="w-24 h-24 rounded-lg border border-gray-300"
-                />
-                <div className="flex flex-col ml-4 justify-between  gap-4">
-                  <span className="font-bold">{product.producto}</span>
-                  <span className="text-gray-500 text-sm">
-                    Juego de Cartas | Único | ${' '}
-                    {product.precioUnitario.toLocaleString('es-AR')}
+            <>
+              {' '}
+              <div
+                className="flex flex-row justify-between items-center mt-6  mx-auto pb-2"
+                key={product.id}
+              >
+                <div className="flex h-full flex-row items-center">
+                  <img
+                    src={ProductImage[product.producto]}
+                    className="w-24 h-24 rounded-lg border border-gray-300"
+                  />
+                  <div className="flex flex-col ml-4 justify-between  gap-4">
+                    <span className="font-bold text-dark dark:text-white">
+                      {product.producto}
+                    </span>
+                    <span className="text-gray-500 text-sm">
+                      Juego de Cartas | Único | ${' '}
+                      {product.precioUnitario.toLocaleString('es-AR')}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex flex-col ml-4 justify-between gap-4 items-end">
+                  <span className="font-bold text-dark dark:text-white">
+                    $ {product.precioTotal.toLocaleString('es-AR')}{' '}
                   </span>
+
+                  <span className="text-gray-500">x{product.cantidad}</span>
                 </div>
               </div>
-              <div className="flex flex-col ml-4 justify-between gap-4 items-end">
-                <span className="font-bold">
-                  $ {product.precioTotal.toLocaleString('es-AR')}{' '}
-                </span>
-
-                <span className="text-gray-500">x{product.cantidad}</span>
-              </div>
-            </div>
+            </>
           )
         })}
+        <hr class="h-px mt-2 bg-gray-200 dark:bg-gray-700 shadow-lg" />
+        <div className="flex flex-row w-full justify-between mt-6">
+          <div className="flex-col w-1/2">
+            <span className="text-dark dark:text-white font-semibold">
+              Cliente
+            </span>
+            <div className="mt-2">
+              <p className="text-gray-600 text-md dark:text-gray-400">
+                {data.order.nombre}
+              </p>
+              <p className="text-gray-600 text-md dark:text-gray-400">
+                <span className="text-gray-400 dark:text-gray-600">
+                  DNI/CUIT
+                </span>{' '}
+                {data.order.DNI}
+              </p>
+            </div>
+            {data.order.canalVenta !== 'Mercado Libre' && (
+              <div className="mt-4">
+                <p className="text-gray-400 text-sm dark:text-gray-600">
+                  Contacto
+                </p>
+                <p className="text-gray-600 text-md dark:text-gray-400">
+                  {data.order.mail}
+                </p>
+
+                <p className="text-gray-600 text-md dark:text-gray-400">
+                  {data.order.telefono}
+                </p>
+              </div>
+            )}
+          </div>
+          <div className="flex-col w-1/2">
+            <span className="text-dark dark:text-white font-semibold">
+              Entrega
+            </span>
+            <span className="text-gray-500">
+              {data.order.Shipment.map((shipment) => {
+                return (
+                  <div key={shipment.id}>
+                    <ShipmentInfo estado={shipment.estado} />
+                    <div className="mt-2">
+                      <p className="text-gray-400 text-sm dark:text-gray-600">
+                        Método de Envío
+                      </p>
+                      <p className="text-gray-600 text-md dark:text-gray-400">
+                        {shipment.tipoEnvio}
+                      </p>
+                    </div>
+                    <div className="mt-4">
+                      <p className="text-gray-400 text-sm dark:text-gray-600">
+                        Ubicación
+                      </p>
+                      <p className="text-gray-600 text-md dark:text-gray-400">
+                        {shipment.ciudad} | {shipment.provincia}
+                      </p>
+
+                      <p className="text-gray-600 text-md dark:text-gray-400">
+                        CP {shipment.codigoPostal}
+                      </p>
+                    </div>
+                  </div>
+                )
+              })}
+            </span>
+          </div>
+        </div>
+        <hr class="h-px mt-4 bg-gray-200 dark:bg-gray-700 shadow-lg" />
+        <div className="flex flex-row w-full justify-between mt-4">
+          <div className="flex-col w-1/2">
+            <div className="flex justify-between">
+              <span className="text-dark dark:text-white font-semibold">
+                Pago
+              </span>
+              {data.order.Payments.length > 1 && (
+                <span className="text-gray-500 mr-8">
+                  <span className="text-gray-400 dark:text-gray-600">
+                    Pago Dividido
+                  </span>
+                </span>
+              )}
+            </div>
+            <div className="flex flex-row justify-between mt-1">
+              {data.order.Payments.map((payment) => {
+                return <ShipmentInfo estado={payment.estado} key={payment.id} />
+              })}
+            </div>
+
+            {data.order.Payments.map((payment) => {
+              return (
+                <div key={payment.id}>
+                  <div className="flex flex-col lg:flex-row justify-between lg:mr-6  ">
+                    <div className="mt-4">
+                      <p className="text-gray-400 text-sm dark:text-gray-600">
+                        Método de Pago
+                      </p>
+                      <p className="text-gray-600 text-md dark:text-gray-400">
+                        {payment.tipoPago}
+                      </p>
+                    </div>
+                    <div className="mt-4 lg:text-right">
+                      <p className="text-gray-400 text-sm dark:text-gray-600 ">
+                        Cuenta de Destino
+                      </p>
+                      <p className="text-gray-600 text-md dark:text-gray-400">
+                        {payment.cuentaDestino}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col lg:flex-row justify-between lg:mr-4 ">
+                    {payment.fechaPago && (
+                      <div className="mt-4">
+                        <p className="text-gray-400 text-sm dark:text-gray-600">
+                          Fecha de Pago
+                        </p>
+                        <p className="text-gray-600 text-md dark:text-gray-400">
+                          {new Date(payment.fechaPago).toLocaleDateString()}
+                        </p>
+                      </div>
+                    )}
+
+                    {payment.fechaLiquidacion && (
+                      <div className="mt-4 lg:text-right">
+                        <p className="text-gray-400 text-sm dark:text-gray-600">
+                          Fecha de Liquidación
+                        </p>
+                        <p className="text-gray-600 text-md dark:text-gray-400">
+                          {new Date(
+                            payment.fechaLiquidacion
+                          ).toLocaleDateString()}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+          <div className="flex-col w-1/2">
+            <span className="text-dark dark:text-white font-semibold">
+              Total de Orden
+            </span>
+            <div className="flex flex-col mt-4">
+              <div className="flex flex-row justify-between items-center">
+                <span className="text-gray-400 text-sm dark:text-gray-600">
+                  Productos
+                </span>
+                <span className="text-gray-600 text-md dark:text-gray-400">
+                  {' '}
+                  ${' '}
+                  {data.order.Products.reduce(
+                    (a, b) => a + b.precioTotal,
+                    0
+                  ).toLocaleString('es-AR')}
+                </span>
+              </div>
+              <div className="flex flex-row justify-between items-center"></div>
+              <div className="flex flex-row justify-between items-center"></div>
+            </div>
+          </div>
+        </div>
       </div>
       <div className="mt-20">{JSON.stringify(data, null, 2)}</div>
     </section>
