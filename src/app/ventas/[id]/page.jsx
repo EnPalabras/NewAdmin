@@ -220,7 +220,7 @@ export default function Page({ params }) {
                     src={ProductImage[product.producto]}
                     className="w-24 h-24 rounded-lg border border-gray-300"
                   />
-                  <div className="flex flex-col ml-4 justify-between  gap-4">
+                  <div className="flex flex-col ml-4 justify-between gap-4 max-w-1/2">
                     <span className="font-bold text-dark dark:text-white">
                       {product.producto}
                     </span>
@@ -231,17 +231,20 @@ export default function Page({ params }) {
                   </div>
                 </div>
                 <div className="flex flex-col ml-4 justify-between gap-4 items-end">
-                  <span className="font-bold text-dark dark:text-white">
+                  <span className="font-bold text-dark text-sm dark:text-white">
                     $ {product.precioTotal.toLocaleString('es-AR')}{' '}
                   </span>
 
-                  <span className="text-gray-500">x{product.cantidad}</span>
+                  <span className="text-gray-500 text-sm">
+                    x{product.cantidad}
+                  </span>
                 </div>
               </div>
             </>
           )
         })}
         <hr class="h-px mt-2 bg-gray-200 dark:bg-gray-700 shadow-lg" />
+
         <div className="flex flex-row w-full justify-between mt-6">
           <div className="flex-col w-1/2">
             <span className="text-dark dark:text-white font-semibold">
@@ -255,6 +258,8 @@ export default function Page({ params }) {
                 <span className="text-gray-400 dark:text-gray-600">
                   DNI/CUIT
                 </span>{' '}
+              </p>
+              <p className="text-gray-600 text-md dark:text-gray-400">
                 {data.order.DNI}
               </p>
             </div>
@@ -263,11 +268,11 @@ export default function Page({ params }) {
                 <p className="text-gray-400 text-sm dark:text-gray-600">
                   Contacto
                 </p>
-                <p className="text-gray-600 text-md dark:text-gray-400">
+                <p className="text-gray-600 text-sm dark:text-gray-400">
                   {data.order.mail}
                 </p>
 
-                <p className="text-gray-600 text-md dark:text-gray-400">
+                <p className="text-gray-600 text-sm dark:text-gray-400">
                   {data.order.telefono}
                 </p>
               </div>
