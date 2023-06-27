@@ -4,6 +4,7 @@ import Apps from './Sidebar/Apps'
 import Notifications from './Sidebar/Notifications'
 import Aside from './Sidebar/Aside'
 import { useEffect, useState, useRef } from 'react'
+import Link from 'next/link'
 
 const Sidebar = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
@@ -137,19 +138,13 @@ const Sidebar = ({ children }) => {
                 </svg>
                 <span className="sr-only">Toggle sidebar</span>
               </button>
-              <a
-                href="https://flowbite.com"
-                className="flex items-center justify-between mr-4"
-              >
+              <Link href="/" className="flex items-center justify-between mr-4">
                 <img
-                  src="https://flowbite.s3.amazonaws.com/logo.svg"
-                  className="mr-3 h-8"
-                  alt="Flowbite Logo"
+                  src="https://d3ugyf2ht6aenh.cloudfront.net/stores/001/705/915/themes/common/logo-406989337-1661261292-f275c90c94f38041bb3595811ed7d4b31661261293-320-0.png?0"
+                  className="h-8 md:h-12"
+                  alt="En Palabras"
                 />
-                <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
-                  Flowbit
-                </span>
-              </a>
+              </Link>
             </div>
             <div className="flex items-center lg:order-2">
               <button
@@ -185,10 +180,10 @@ const Sidebar = ({ children }) => {
                 )}
               </button>
 
-              <Notifications
+              {/* <Notifications
                 isDropdownOpen={isDropdownOpen.notifications}
                 setIsDropdownOpen={() => toggleDropdown('notifications')}
-              />
+              /> */}
               <Apps
                 isDropdownOpen={isDropdownOpen.apps}
                 setIsDropdownOpen={() => toggleDropdown('apps')}

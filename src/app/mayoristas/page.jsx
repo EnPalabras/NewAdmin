@@ -1,6 +1,6 @@
 import CardMayorista from '@/components/Cards/Mayoristas'
 import Link from 'next/link'
-import React from 'react'
+import { use } from 'react'
 
 const fakeData = [
   {
@@ -58,6 +58,10 @@ const fakeData = [
 ]
 
 export default function MayoristasPage() {
+  const data = use(getData())
+
+  console.log(data)
+
   return (
     <section className="bg-white dark:bg-gray-900 md:ml-64 mt-10 md:mt-4 py-16">
       <div className="px-8">
@@ -101,11 +105,27 @@ export default function MayoristasPage() {
             gridGap: '1rem',
           }}
         >
-          {fakeData.map((data, i) => {
+          {data.data.map((data, i) => {
             return <CardMayorista key={i} data={data} />
           })}
         </div>
       </div>
     </section>
   )
+}
+
+async function getData() {
+  const res = await fetch(
+    `https://serverep-production.up.railway.app/api/mayoristas`
+  )
+  // The return value is *not* serialized
+  // You can return Date, Map, Set, etc.
+
+  // Recommendation: handle errors
+  if (!res.ok) {
+    // This will activate the closest `error.js` Error Boundary
+    throw new Error('Failed to fetch data')
+  }
+
+  return res.json()
 }

@@ -149,7 +149,7 @@ export default function SalesTable() {
             searchButton={reloadSearch}
           />
           <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+            <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 striped">
               <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
                   <th scope="col" className="hidden xl:table-cell px-4 py-3">
@@ -170,12 +170,7 @@ export default function SalesTable() {
                   <th scope="col" className="hidden xl:table-cell px-4 py-3">
                     Productos
                   </th>
-                  <th scope="col" className="hidden xl:table-cell px-4 py-3">
-                    Tipo Envío
-                  </th>
-                  <th scope="col" className="px-4 py-3 text-center">
-                    Total
-                  </th>
+
                   <th scope="col" className="px-4 py-3"></th>
                 </tr>
               </thead>
@@ -197,9 +192,6 @@ export default function SalesTable() {
                           <p className="leading-relaxed h-5 animate-pulse bg-gray-400 border-radius-20 rounded"></p>
                         </td>
                         <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white ">
-                          <p className="leading-relaxed h-5 animate-pulse bg-gray-400 border-radius-20 rounded"></p>
-                        </td>
-                        <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white hidden xl:table-cell">
                           <p className="leading-relaxed h-5 animate-pulse bg-gray-400 border-radius-20 rounded"></p>
                         </td>
                         <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white hidden xl:table-cell">
@@ -247,7 +239,7 @@ export default function SalesTable() {
                         {sale.idEP}
                       </td>
 
-                      <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                      <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap max-w-[150px] truncate dark:text-white">
                         {sale.nombre.split(' ', 3).join(' ')}
                       </td>
                       <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white hidden xl:table-cell">
@@ -255,30 +247,7 @@ export default function SalesTable() {
                           {sale.Products.length}
                         </span>{' '}
                       </td>
-                      <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white hidden xl:table-cell">
-                        <div className="flex items-center">
-                          <span className="text-gray-500 dark:text-gray-400">
-                            Envío Pack
-                          </span>
-                        </div>
-                      </td>
 
-                      <td
-                        className="px-4 py-4 flex justify-between items-end whitespace-nowrap font-semibold 
-                      "
-                      >
-                        <p>$</p>
-                        {sale.Payments.reduce((acc, payment) => {
-                          return (acc + payment.montoTotal).toLocaleString(
-                            'es-AR',
-                            {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                              maximumSignificantDigits: 3,
-                            }
-                          )
-                        }, 0)}
-                      </td>
                       <td className="px-2 py-1">
                         <Link
                           href={`/ventas/${sale.idEP}`}
