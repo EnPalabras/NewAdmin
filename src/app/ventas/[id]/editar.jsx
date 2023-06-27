@@ -38,7 +38,10 @@ export default function DefaultModal({ orderData }) {
             </p>
             <p className="text-gray-500 text-md">Nombre</p>
             {productData.map((product, index) => (
-              <div className="flex flex-row justify-between gap-2 w-full">
+              <div
+                className="flex flex-row justify-between gap-2 w-full"
+                key={product.id}
+              >
                 <div className="w-2/5">
                   <div className="mb-2 block">
                     <Label htmlFor="product" value="Producto" />
