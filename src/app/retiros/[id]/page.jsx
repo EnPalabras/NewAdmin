@@ -181,38 +181,35 @@ export default function Page({ params }) {
 
         {data.order.Products.map((product) => {
           return (
-            <>
-              {' '}
-              <div
-                className="flex flex-row justify-between items-center mt-6  mx-auto pb-2"
-                key={product.id}
-              >
-                <div className="flex h-full flex-row items-center">
-                  <img
-                    src={ProductImage[product.producto]}
-                    className="w-24 h-24 rounded-lg border border-gray-300"
-                  />
-                  <div className="flex flex-col ml-4 justify-between gap-4 max-w-2/5">
-                    <span className="font-bold text-dark dark:text-white">
-                      {product.producto}
-                    </span>
-                    <span className="text-gray-500 text-sm">
-                      Juego de Cartas | ${' '}
-                      {product.precioUnitario.toLocaleString('es-AR')}
-                    </span>
-                  </div>
-                </div>
-                <div className="flex flex-col ml-4 justify-between gap-4 items-end">
-                  <span className="font-bold text-dark text-sm md:text-lg dark:text-white">
-                    $ {product.precioTotal.toLocaleString('es-AR')}{' '}
+            <div
+              className="flex flex-row justify-between items-center mt-6  mx-auto pb-2"
+              key={product.id}
+            >
+              <div className="flex h-full flex-row items-center">
+                <img
+                  src={ProductImage[product.producto]}
+                  className="w-24 h-24 rounded-lg border border-gray-300"
+                />
+                <div className="flex flex-col ml-4 justify-between gap-4 max-w-2/5">
+                  <span className="font-bold text-dark dark:text-white">
+                    {product.producto}
                   </span>
-
-                  <span className="text-gray-500 text-sm md:text-lg">
-                    x{product.cantidad}
+                  <span className="text-gray-500 text-sm">
+                    Juego de Cartas | ${' '}
+                    {product.precioUnitario.toLocaleString('es-AR')}
                   </span>
                 </div>
               </div>
-            </>
+              <div className="flex flex-col ml-4 justify-between gap-4 items-end">
+                <span className="font-bold text-dark text-sm md:text-lg dark:text-white">
+                  $ {product.precioTotal.toLocaleString('es-AR')}{' '}
+                </span>
+
+                <span className="text-gray-500 text-sm md:text-lg">
+                  x{product.cantidad}
+                </span>
+              </div>
+            </div>
           )
         })}
         <hr class="h-px mt-2 bg-gray-200 dark:bg-gray-700 shadow-lg" />
@@ -386,7 +383,10 @@ export default function Page({ params }) {
                 data.order.Discounts.length > 0 &&
                 data.order.Discounts.map((discount) => {
                   return (
-                    <div className="flex flex-row justify-between items-center">
+                    <div
+                      className="flex flex-row justify-between items-center"
+                      key={discount.id}
+                    >
                       <span className="text-gray-400 text-sm dark:text-gray-600 text-wrap md:text-lg">
                         {discount.tipoDescuento}{' '}
                         {discount.codigoDescuento &&
