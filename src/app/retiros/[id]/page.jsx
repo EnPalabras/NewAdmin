@@ -445,10 +445,11 @@ export default function Page({ params }) {
           <div className="mt-6 px-6 flex flex-col sm:flex-row w-full gap-4">
             <div className="flex flex-col justify-between w-full sm:w-1/2">
               <h3 className="text-base font-semibold text-dark border-b  w-full pb-2 text-center">
-                Pago {data.order.Payments[0].estado}
+                Pago
               </h3>
               <div className="mt-2 flex flex-row justify-between items-center h-full">
-                {data.order.Payments[0].estado === 'Pagado' ? (
+                {data.order.Payments[0].estado === 'Pagado' ||
+                data.order.Payments[0].estado === 'paid' ? (
                   <span
                     className="text-gray-400 text-sm mx-auto font-bold rounded px-2 py-1
                         bg-green-100 text-green-800 text-sm"
