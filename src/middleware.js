@@ -22,7 +22,15 @@ export async function middleware(request) {
     }
   }
 
-  if (pathname !== '/login' && pathname !== '/register') {
+  if (
+    pathname !== '/login' &&
+    pathname !== '/register' &&
+    pathname !== '/retiros'
+  ) {
+    if (token && token.email === 'probandoestemail@gmail.com') {
+      const url = new URL(`/retiros`, request.url)
+      return NextResponse.redirect(url)
+    }
     if (!token) {
       const url = new URL(`/login`, request.url)
       return NextResponse.redirect(url)

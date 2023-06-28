@@ -1,42 +1,52 @@
 import Link from 'next/link'
 import { use } from 'react'
+import { ReceivedPayment, Shipped } from './buttons'
 
 const BreadCrumbOrder = (id) => {
   return (
-    <nav className="flex ml-5 md:ml-10" aria-label="Breadcrumb">
-      <ol className="inline-flex items-center space-x-1 md:space-x-3">
-        <li>
-          <div className="flex items-center">
-            <Link
-              href="/retiros"
-              className="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2 dark:text-gray-400 dark:hover:text-white"
-            >
-              Retiros
-            </Link>
-          </div>
-        </li>
-        <li aria-current="page">
-          <div className="flex items-center">
-            <svg
-              aria-hidden="true"
-              className="w-6 h-6 text-gray-400"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                clip-rule="evenodd"
-              ></path>
-            </svg>
-            <span className="ml-1 text-sm font-medium text-gray-500 md:ml-2 dark:text-gray-400">
-              {id.id}
-            </span>
-          </div>
-        </li>
-      </ol>
-    </nav>
+    <div className="flex flex-row justify-between">
+      <nav className="flex ml-5 md:ml-10" aria-label="Breadcrumb">
+        <ol className="inline-flex items-center space-x-1 md:space-x-3">
+          <li>
+            <div className="flex items-center">
+              <Link
+                href="/retiros"
+                className="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2 dark:text-gray-400 dark:hover:text-white"
+              >
+                Retiros
+              </Link>
+            </div>
+          </li>
+          <li aria-current="page">
+            <div className="flex items-center">
+              <svg
+                aria-hidden="true"
+                className="w-6 h-6 text-gray-400"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                  clipRule="evenodd"
+                ></path>
+              </svg>
+              <span className="ml-1 text-sm font-medium text-gray-500 md:ml-2 dark:text-gray-400">
+                {id.id}
+              </span>
+            </div>
+          </li>
+        </ol>
+      </nav>
+      <div className="flex mr-5 md:mr-10">
+        <Link href={`/retiros/estadisticas`}>
+          <button class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
+            Estadísticas
+          </button>
+        </Link>
+      </div>
+    </div>
   )
 }
 
@@ -138,17 +148,26 @@ const ShipmentInfo = ({ estado }) => {
   )
 }
 
+const PaymentStatus = {
+  authorized: 'Autorizado',
+  pending: 'Pendiente',
+  paid: 'Pagado',
+  abandoned: 'Abandonado',
+  refunded: 'Reintegrado',
+  voided: 'Rechazado',
+}
+
+const ShipStatus = {
+  fulfilled: 'Entregado',
+  shipped: 'Entregado',
+  unpacked: 'Pendiente',
+  unfilfilled: 'Pendiente',
+  unshipped: 'Pendiente',
+}
+
 export default function Page({ params }) {
   const data = use(getData(params.id))
-
-  const totals = {
-    totalProductos: data.order.Products.reduce((a, b) => a + b.precioTotal, 0),
-    totalEnvios: data.order.Shipment.reduce((a, b) => a + b.pagoEnvio, 0),
-    totalDescuentos:
-      data.order.Discounts && data.order.Discounts.length > 0
-        ? data.order.Discounts.reduce((a, b) => a + b.montoDescuento, 0)
-        : 0,
-  }
+  const tnData = use(tnFetch(data.order.externalId))
 
   return (
     <section className="bg-white dark:bg-gray-900 mx-1 md:mx-10 my-4 py-16">
@@ -157,20 +176,12 @@ export default function Page({ params }) {
         <div className="flex flex-row flex-wrap justify-between items-center mt-10">
           <div>
             <h1 className="text-3xl md:text-4xl font-extrabold max-w-screen-xl text-center tracking-tight leading-none text-gray-900  dark:text-white">
-              {params.id}
+              Orden: # {tnData.number}
             </h1>
           </div>
-          <div className="flex items-stretch gap-2">
-            <button
-              type="button"
-              className="text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-lg shadow-md text-sm px-5 py-2 dark:bg-blue-600 dark:hover:bg-blue-700"
-            >
-              Default
-            </button>
-          </div>
         </div>
-        <div className="flex flex-row mt-6 pb-4 border-b ">
-          <span className="text-gray-500">Fecha de venta: </span>
+        <div className="flex flex-row mt-6 pb-4 border-b">
+          <span className="text-gray-500">Fecha de compra: </span>
           <span className="text-gray-900 ml-2 dark:text-gray-200">
             {' '}
             {new Date(data.order.fechaCreada).toLocaleDateString()}
@@ -178,260 +189,297 @@ export default function Page({ params }) {
           <span className="text-gray-300 mx-3"> | </span>
           <StatusInfo estado={data.order.estado} />
         </div>
-
-        {data.order.Products.map((product) => {
-          return (
-            <div
-              className="flex flex-row justify-between items-center mt-6  mx-auto pb-2"
-              key={product.id}
-            >
-              <div className="flex h-full flex-row items-center">
-                <img
-                  src={ProductImage[product.producto]}
-                  className="w-24 h-24 rounded-lg border border-gray-300"
-                />
-                <div className="flex flex-col ml-4 justify-between gap-4 max-w-2/5">
-                  <span className="font-bold text-dark dark:text-white">
-                    {product.producto}
-                  </span>
-                  <span className="text-gray-500 text-sm">
-                    Juego de Cartas | ${' '}
-                    {product.precioUnitario.toLocaleString('es-AR')}
-                  </span>
-                </div>
-              </div>
-              <div className="flex flex-col ml-4 justify-between gap-4 items-end">
-                <span className="font-bold text-dark text-sm md:text-lg dark:text-white">
-                  $ {product.precioTotal.toLocaleString('es-AR')}{' '}
-                </span>
-
-                <span className="text-gray-500 text-sm md:text-lg">
-                  x{product.cantidad}
-                </span>
-              </div>
-            </div>
-          )
-        })}
-        <hr class="h-px mt-2 bg-gray-200 dark:bg-gray-700 shadow-lg" />
-
-        <div className="flex flex-row w-full justify-between mt-6">
-          <div className="flex-col w-1/2">
-            <span className="text-dark dark:text-white font-semibold">
-              Cliente
-            </span>
-            <div className="mt-2">
-              <p className="text-gray-600 text-md dark:text-gray-400">
-                {data.order.nombre}
-              </p>
-              <p className="text-gray-600 text-md dark:text-gray-400">
-                <span className="text-gray-400 dark:text-gray-600">
-                  DNI/CUIT
-                </span>{' '}
-              </p>
-              <p className="text-gray-600 text-md dark:text-gray-400">
-                {data.order.DNI}
-              </p>
-            </div>
-            {data.order.canalVenta !== 'Mercado Libre' && (
-              <div className="mt-4">
-                <p className="text-gray-400 text-sm dark:text-gray-600">
-                  Contacto
-                </p>
-                <p className="text-gray-600 text-sm dark:text-gray-400">
-                  {data.order.mail}
-                </p>
-
-                <p className="text-gray-600 text-sm dark:text-gray-400">
-                  {data.order.telefono}
-                </p>
-              </div>
-            )}
-          </div>
-          <div className="flex-col w-1/2">
-            <span className="text-dark dark:text-white font-semibold">
-              Entrega
-            </span>
-            <span className="text-gray-500">
-              {data.order.Shipment.map((shipment) => {
+        <div className="flex flex-col lg:flex-row gap-2">
+          <div className="flex flex-col mt-6 pb-4 border rounded-md w-full lg:w-2/3 p-4">
+            <h3 className="text-lg font-semibold text-dark border-b w-full pb-2">
+              Productos
+            </h3>
+            <div className="my-auto ">
+              {data.order.Products.map((product) => {
                 return (
-                  <div key={shipment.id}>
-                    <ShipmentInfo estado={shipment.estado} />
-                    <div className="mt-2">
-                      <p className="text-gray-400 text-sm dark:text-gray-600">
-                        Método de Envío
-                      </p>
-                      <p className="text-gray-600 text-md dark:text-gray-400">
-                        {shipment.tipoEnvio}
-                      </p>
+                  <div
+                    className="flex flex-row justify-between items-center mt-4  w-full pb-2 "
+                    key={product.id}
+                  >
+                    <div className="flex h-full flex-row items-center">
+                      <img
+                        src={ProductImage[product.producto]}
+                        className="w-24 h-24 rounded-lg border border-gray-300"
+                      />
+                      <div className="flex flex-col ml-4 justify-between gap-4 max-w-2/5">
+                        <span className="font-bold text-dark dark:text-white">
+                          {product.producto}
+                        </span>
+                        <span className="text-gray-500 text-sm">
+                          Juego de Cartas | ${' '}
+                          {product.precioUnitario.toLocaleString('es-AR')}
+                        </span>
+                      </div>
                     </div>
-                    <div className="mt-4">
-                      <p className="text-gray-400 text-sm dark:text-gray-600">
-                        Ubicación
-                      </p>
-                      <p className="text-gray-600 text-md dark:text-gray-400">
-                        {shipment.ciudad} | {shipment.provincia}
-                      </p>
+                    <div className="flex flex-col ml-4 justify-between gap-4 items-end">
+                      <span className="font-bold text-dark text-sm md:text-lg dark:text-white">
+                        $ {product.precioTotal.toLocaleString('es-AR')}{' '}
+                      </span>
 
-                      <p className="text-gray-600 text-md dark:text-gray-400">
-                        CP {shipment.codigoPostal}
-                      </p>
+                      <span className="text-gray-500 text-sm md:text-lg">
+                        x{product.cantidad}
+                      </span>
                     </div>
                   </div>
                 )
               })}
-            </span>
+            </div>
+          </div>
+          <div className="flex flex-col mt-6 pb-4 border rounded-md w-full lg:w-1/3 p-4">
+            <h3 className="text-lg font-semibold text-dark border-b w-full pb-2">
+              Cliente
+            </h3>
+            <div className="mt-4 flex flex-col justify-between h-full">
+              <div>
+                <div className="flex flex-row gap-2 items-center">
+                  <svg
+                    class="w-5 h-5 text-gray-800 dark:text-white"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 14 18"
+                  >
+                    <path
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M7 8a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm-2 3h4a4 4 0 0 1 4 4v2H1v-2a4 4 0 0 1 4-4Z"
+                    />
+                  </svg>
+                  <p className="text-gray-600 text-md dark:text-gray-400 font-bold ">
+                    {data.order.nombre}
+                  </p>
+                </div>
+                <p className="text-gray-600 text-md dark:text-gray-400">
+                  <span className="text-gray-400 dark:text-gray-600 text-sm">
+                    {data.order.mail}
+                  </span>{' '}
+                </p>
+              </div>
+              <div className="mt-6 flex-col">
+                <p className=" text-gray-600 text-md dark:text-gray-400">
+                  <span className="text-gray-400 dark:text-gray-600">
+                    DNI/CUIT
+                  </span>{' '}
+                  {data.order.DNI}
+                </p>
+                <p className=" text-gray-600 text-md dark:text-gray-400">
+                  <span className="text-gray-400 dark:text-gray-600">
+                    Teléfono:
+                  </span>{' '}
+                  {data.order.telefono}
+                </p>{' '}
+              </div>
+
+              <div className="bg-gray-200 rounded-md mt-4 py-2 px-2 flex flex-row">
+                <div className="relative">
+                  <svg
+                    class="w-4 h-4 text-gray-800 dark:text-white"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="currentColor"
+                    viewBox="0 0 20 18"
+                  >
+                    <path d="M18 0H2a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h3.546l3.2 3.659a1 1 0 0 0 1.506 0L13.454 14H18a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm-8 10H5a1 1 0 0 1 0-2h5a1 1 0 1 1 0 2Zm5-4H5a1 1 0 0 1 0-2h10a1 1 0 1 1 0 2Z" />
+                  </svg>
+                </div>
+                <div className="px-2 text-sm">{tnData.note}</div>
+              </div>
+            </div>
           </div>
         </div>
-        <hr class="h-px mt-4 bg-gray-200 dark:bg-gray-700 shadow-lg" />
-        <div className="flex flex-row w-full justify-between mt-4">
-          <div className="flex-col w-1/2">
-            <div className="flex justify-between">
-              <span className="text-dark dark:text-white font-semibold">
-                Pago
-              </span>
-              {data.order.Payments.length > 1 && (
-                <span className="text-gray-500 mr-8">
-                  <span className="text-gray-400 dark:text-gray-600">
-                    Pago Dividido
-                  </span>
-                </span>
-              )}
-            </div>
-            <div className="flex flex-row justify-between mt-1">
-              {data.order.Payments.map((payment) => {
-                return <ShipmentInfo estado={payment.estado} key={payment.id} />
-              })}
-            </div>
 
-            {data.order.Payments.map((payment) => {
-              return (
-                <div key={payment.id} className="xl:w-2/3">
-                  <div className="flex flex-col lg:flex-row justify-between lg:mr-6  ">
-                    <div className="mt-4">
-                      <p className="text-gray-400 text-sm dark:text-gray-600">
-                        Método de Pago
-                      </p>
-                      <p className="text-gray-600 text-md dark:text-gray-400">
-                        {payment.tipoPago}
-                      </p>
-                    </div>
-                    <div className="mt-4 lg:text-right">
-                      <p className="text-gray-400 text-sm dark:text-gray-600 ">
-                        Cuenta de Destino
-                      </p>
-                      <p className="text-gray-600 text-md dark:text-gray-400">
-                        {payment.cuentaDestino}
-                      </p>
-                    </div>
+        <div className="flex flex-col lg:flex-row gap-2">
+          <div className="flex flex-col mt-6 pb-4 border rounded-md w-full lg:w-2/3 p-4">
+            <h3 className="text-lg font-semibold text-dark border-b w-full pb-2">
+              Información de Pago
+            </h3>
+            <div className="mt-4 flex flex-col sm:flex-row justify-between h-full gap-4 md:gap-10">
+              <div className="w-full md:w-1/2 flex flex-col justify-between h-full items-center">
+                <div className="flex flex-row justify-between w-full">
+                  <p className="text-gray-400 text-sm ">Método de Pago</p>
+                  <p className="text-gray-400 text-sm font-bold text-right">
+                    {data.order.Payments[0].tipoPago}
+                  </p>
+                </div>
+                <div className="mt-4 flex flex-row justify-between w-full items-center">
+                  <p className="text-gray-400 text-sm ">Estado del Pago</p>
+                  <p
+                    className={`text-gray-400 text-sm font-bold rounded px-2 py-1
+                    ${
+                      tnData.payment_status === 'paid' &&
+                      'bg-green-100 text-green-800 text-sm'
+                    }
+                     ${
+                       (tnData.payment_status === 'abandonded' ||
+                         tnData.payment_status === 'voided' ||
+                         tnData.payment_status === 'refunded') &&
+                       'bg-red-100 text-red-800 text-sm'
+                     }
+                      ${
+                        tnData.payment_status === 'pending' &&
+                        'bg-yellow-100 text-yellow-800 text-sm'
+                      }
+                     
+                    `}
+                  >
+                    {PaymentStatus[tnData.payment_status]}
+                  </p>
+                </div>
+                <div className="mt-4 flex flex-row justify-between w-full">
+                  <p className="text-gray-400 text-sm ">Fecha de Pago</p>
+                  <p className="text-gray-400 text-sm font-bold text-right">
+                    {tnData.paid_at
+                      ? new Date(tnData.paid_at).toLocaleDateString()
+                      : ''}
+                  </p>
+                </div>
+              </div>
+              <div className="border-b border-4 sm:border sm:border-r"></div>
+              <div className="flex flex-col justify-between w-full md:w-1/2 gap-4">
+                <div className="flex flex-row justify-between w-full border-b pb-2">
+                  <p className="text-gray-400 text-sm ">Subtotal</p>
+                  <p className="text-gray-400 text-sm ">
+                    ${' '}
+                    {Number(tnData.subtotal).toLocaleString('es-AR', {
+                      minimumFractionDigits: 2,
+                    })}
+                  </p>
+                </div>
+                <div className="border-b  pb-2">
+                  <div className="flex flex-row justify-between w-full ">
+                    <p className="text-gray-400 text-sm break-words">
+                      Descuento Efectivo
+                    </p>
+                    <p className="text-gray-400 text-sm ">
+                      ${' '}
+                      {Number(tnData.discount_gateway).toLocaleString('es-AR', {
+                        minimumFractionDigits: 2,
+                      })}
+                    </p>
                   </div>
-
-                  <div className="flex flex-col lg:flex-row justify-between lg:mr-4 ">
-                    <div className="mt-4">
-                      <p className="text-gray-400 text-sm dark:text-gray-600">
-                        Fecha de Pago
-                      </p>
-                      <p className="text-gray-600 text-md dark:text-gray-400">
-                        {payment.fechaPago
-                          ? new Date(payment.fechaPago).toLocaleDateString()
-                          : 'Pendiente'}
-                      </p>
-                    </div>
-
-                    <div className="mt-4 lg:text-right">
-                      <p className="text-gray-400 text-sm dark:text-gray-600">
-                        Fecha de Liquidación
-                      </p>
-                      <p className="text-gray-600 text-md dark:text-gray-400">
-                        {payment.fechaLiquidacion
-                          ? new Date(
-                              payment.fechaLiquidacion
-                            ).toLocaleDateString()
-                          : 'Pendiente'}
-                      </p>
-                    </div>
+                  <div className="flex flex-row justify-between w-full ">
+                    <p className="text-gray-400 text-sm break-words">
+                      Otros Descuentos
+                    </p>
+                    <p className="text-gray-400 text-sm ">
+                      ${' '}
+                      {Number(
+                        tnData.discount - tnData.discount_gateway
+                      ).toLocaleString('es-AR', {
+                        minimumFractionDigits: 2,
+                      })}
+                    </p>
                   </div>
                 </div>
-              )
-            })}
+                <div className="flex flex-row justify-between w-full ">
+                  <p className="text-gray-400 font-bold break-words ">Total</p>
+                  <p className="text-gray-400 text-sm font-bold">
+                    ${' '}
+                    {Number(tnData.total).toLocaleString('es-AR', {
+                      minimumFractionDigits: 2,
+                    })}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="flex-col w-1/2 ">
-            <span className="text-dark dark:text-white font-semibold ">
-              Total de Orden
-            </span>
-            <div className="flex flex-col mt-4 justify-between gap-4">
-              <div className="flex flex-row justify-between items-center">
-                <span className="text-gray-400 text-sm dark:text-gray-600 md:text-lg ">
-                  Productos
-                </span>
-                <span className="text-gray-600 text-sm dark:text-gray-400 md:text-lg">
-                  {' '}
-                  $ {totals.totalProductos.toLocaleString('es-AR')}
-                </span>
+          <div className="flex flex-col mt-6 pb-4 border rounded-md w-full lg:w-1/3 p-4">
+            <h3 className="text-lg font-semibold text-dark border-b w-full pb-2">
+              Información de Entrega
+            </h3>
+            <div className="w-full mt-4 flex flex-col justify-between h-full items-center">
+              <div className="flex flex-row justify-between w-full">
+                <p className="text-gray-400 text-sm ">Método de Envío</p>
+                <p className="text-gray-400 text-sm font-bold text-right">
+                  {data.order.Shipment[0].tipoEnvio}
+                </p>
               </div>
-              <div className="flex flex-row justify-between items-center">
-                <span className="text-gray-400 text-sm dark:text-gray-600 md:text-lg">
-                  Envío
-                </span>
-                <span className="text-gray-600 text-sm dark:text-gray-400 md:text-lg">
-                  {' '}
-                  $ {totals.totalEnvios.toLocaleString('es-AR')}
-                </span>
+              <div className="mt-4 flex flex-row justify-between w-full items-center">
+                <p className="text-gray-400 text-sm ">Estado del Envío</p>
+                <p
+                  className={`text-sm font-bold rounded px-2 py-1
+                    ${
+                      tnData.shipping_status === 'paid' &&
+                      'bg-green-100 text-green-800 text-sm'
+                    }
+                     ${
+                       (tnData.shipping_status === 'unpacked' ||
+                         tnData.shipping_status === 'unfilfilled' ||
+                         tnData.shipping_status === 'unshipped') &&
+                       'bg-blue-100 text-blue-500 text-sm'
+                     }
+                      ${
+                        tnData.shipping_status === 'fulfilled' ||
+                        (tnData.shipping_status === 'shipped' &&
+                          'bg-green-100 text-green-800 text-sm')
+                      }
+                     
+                    `}
+                >
+                  {ShipStatus[tnData.shipping_status]}
+                </p>
               </div>
-              <hr class="h-px my-2 bg-gray-200 dark:bg-gray-700 shadow-lg" />
-
-              {data.order.Discounts &&
-                data.order.Discounts.length > 0 &&
-                data.order.Discounts.map((discount) => {
-                  return (
-                    <div
-                      className="flex flex-row justify-between items-center"
-                      key={discount.id}
-                    >
-                      <span className="text-gray-400 text-sm dark:text-gray-600 text-wrap md:text-lg">
-                        {discount.tipoDescuento}{' '}
-                        {discount.codigoDescuento &&
-                          `(${discount.codigoDescuento})`}
-                      </span>
-                      <span className="text-gray-600 text-sm dark:text-gray-400 md:text-lg">
-                        {' '}
-                        {'('}$ {discount.montoDescuento.toLocaleString('es-AR')}
-                        {')'}
-                      </span>
-                    </div>
-                  )
-                })}
-
-              {data.order.Discounts && data.order.Discounts.length > 0 && (
-                <hr class="h-px my-2 bg-gray-200 dark:bg-gray-700 shadow-lg" />
-              )}
-              <div className="flex flex-row justify-between items-center ">
-                <span className="text-gray-400 text-sm dark:text-gray-600 font-bold md:text-lg ">
-                  Subtotal
-                </span>
-                <span className="text-gray-600 text-sm dark:text-gray-400 font-bold md:text-lg">
-                  {' '}
-                  ${' '}
-                  {(
-                    totals.totalProductos +
-                    totals.totalEnvios -
-                    totals.totalDescuentos
-                  ).toLocaleString('es-AR')}
-                </span>
+              <div className="mt-4 flex flex-row justify-between w-full">
+                <p className="text-gray-400 text-sm ">Fecha de Entrega</p>
+                <p className="text-gray-400 text-sm font-bold text-right">
+                  {tnData.shipped_at
+                    ? new Date(tnData.shipped_at).toLocaleDateString()
+                    : ''}
+                </p>
               </div>
-              <hr class="h-px my-2 bg-gray-200 dark:bg-gray-700 shadow-lg" />
+            </div>
+          </div>
+        </div>
 
-              <div className="flex flex-row justify-between items-center ">
-                <span className="text-gray-400 text-sm dark:text-gray-600 font-bold md:text-lg">
-                  Recibido
-                </span>
-                <span className="text-gray-600 text-sm dark:text-gray-400 font-bold md:text-lg">
-                  {' '}
-                  ${' '}
-                  {data.order.Payments.reduce(
-                    (a, b) => a + b.montoRecibido,
-                    0
-                  ).toLocaleString('es-AR')}
-                </span>
+        <div className="bg-gray-100 rounded-md mt-4 py-2 px-2 w-full flex flex-col">
+          <h3 className="text-lg font-semibold text-dark border-b  w-full pb-2 text-center">
+            Acciones
+          </h3>
+          <div className="mt-6 px-6 flex flex-col sm:flex-row w-full gap-4">
+            <div className="flex flex-col justify-between w-full sm:w-1/2">
+              <h3 className="text-base font-semibold text-dark border-b  w-full pb-2 text-center">
+                Pago {data.order.Payments[0].estado}
+              </h3>
+              <div className="mt-2 flex flex-row justify-between items-center h-full">
+                {data.order.Payments[0].estado === 'Pagado' ? (
+                  <span
+                    className="text-gray-400 text-sm mx-auto font-bold rounded px-2 py-1
+                        bg-green-100 text-green-800 text-sm"
+                  >
+                    Pago Recibido
+                  </span>
+                ) : (
+                  <ReceivedPayment
+                    defaultAmount={tnData.total}
+                    paymentId={data.order.Payments[0].id}
+                  />
+                )}
+              </div>
+            </div>
+            <div className="border-r sm:border-b border-2"></div>
+            <div className="flex flex-col justify-between w-full sm:w-1/2">
+              <h3 className="text-base font-semibold text-dark border-b  w-full pb-2 text-center">
+                Entrega
+              </h3>
+
+              <div className="mt-2 flex flex-row justify-between items-center h-full">
+                {tnData.shipping_status === 'shipped' ? (
+                  <span
+                    className="text-gray-400 text-sm mx-auto font-bold rounded px-2 py-1 
+                        bg-green-100 text-green-800 text-sm"
+                  >
+                    Entregada
+                  </span>
+                ) : (
+                  <Shipped externalId={data.order.externalId} />
+                )}
               </div>
             </div>
           </div>
@@ -443,8 +491,41 @@ export default function Page({ params }) {
 
 async function getData(id) {
   const res = await fetch(
-    `https://serverep-production.up.railway.app/api/ventas/order/${id}`
+    `https://serverep-production.up.railway.app/api/ventas/order/${id}`,
+    {
+      next: {
+        tags: ['actualizar'],
+      },
+    }
   )
+  // The return value is *not* serialized
+  // You can return Date, Map, Set, etc.
+
+  // Recommendation: handle errors
+  if (!res.ok) {
+    // This will activate the closest `error.js` Error Boundary
+    throw new Error('Failed to fetch data')
+  }
+
+  return res.json()
+}
+
+async function tnFetch(id) {
+  const URL = `https://api.tiendanube.com/v1/1705915/orders/${id}`
+  const headers = {
+    'Content-Type': 'application/json',
+    Authentication: process.env.AUTH_TIENDANUBE,
+    'User-Agent': 'En Palabras (enpalabrass@gmail.com)',
+  }
+
+  const res = await fetch(URL, {
+    method: 'GET',
+    headers: headers,
+    next: {
+      tags: ['actualizar'],
+    },
+  })
+
   // The return value is *not* serialized
   // You can return Date, Map, Set, etc.
 

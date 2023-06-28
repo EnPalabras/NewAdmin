@@ -4,64 +4,52 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 import { redirect } from 'next/navigation'
+import { Toast } from 'flowbite-react'
 
 export const TableHeader = ({ search, editSearch, searchButton }) => {
   return (
     <div className="flex flex-col px-2 py-4 w-full justify-between gap-y-2 gap-2 md:gap-4">
-      <div className="flex flex-row justify-between gap-2 w-full">
-        <div className="relative w-3/4 items-center">
-          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-            <svg
-              aria-hidden="true"
-              className="w-5 h-5 text-gray-500 dark:text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              ></path>
-            </svg>
-          </div>
+      <form onSubmit={searchButton}>
+        <div className="flex flex-row justify-between gap-2 w-full">
+          <div className="relative w-3/4 items-center">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <svg
+                aria-hidden="true"
+                className="w-5 h-5 text-gray-500 dark:text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                ></path>
+              </svg>
+            </div>
 
-          <input
-            type="search"
-            id="default-search"
-            value={search}
-            onChange={(e) => editSearch(e.target.value)}
-            className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 "
-            placeholder="TN-18989..."
-            required
-          />
+            <input
+              type="search"
+              id="default-search"
+              value={search}
+              onChange={(e) => editSearch(e.target.value)}
+              className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 "
+              placeholder="TN-18989..."
+              required
+            />
+          </div>
+          <div className="flex flex-row w-1/4 justify-between gap-2">
+            <button className="flex items-center w-full  justify-center px-4 py-4 text-sm font-medium text-gray-900 rounded-lg bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600 dark:placeholder-gray-400 ">
+              Buscar
+            </button>
+          </div>
         </div>
-        <div className="flex flex-row w-1/4 justify-between gap-2">
-          <button
-            onClick={searchButton}
-            className="flex items-center w-full  justify-center px-4 py-4 text-sm font-medium text-gray-900 rounded-lg bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600 dark:placeholder-gray-400 "
-          >
-            Buscar
-          </button>
-        </div>
-      </div>
+      </form>
     </div>
   )
 }
-
-//   <td className="px-2 py-4 text-center">
-//                     <button className=" py-2 px-3 rounded-md bg-green-500 hover:bg-green-700 transition duration-200 ease-in-out text-white text-xs font-semibold">
-//                       Marcar Pago
-//                     </button>
-//                   </td>
-
-//                   <td className="px-2 py-4 text-center">
-//                     <button className=" py-2 px-3 rounded-md bg-green-500 hover:bg-green-700 transition duration-200 ease-in-out text-white text-xs font-semibold">
-//                       Marcar Entregado
-//                     </button>
-//                   </td>
 
 const canalColors = {
   'Mercado Libre':
@@ -73,7 +61,7 @@ const canalColors = {
   shipped: 'bg-green-500 text-white ',
 }
 
-const useSalesData = (pagination, salesChannel, search) => {
+const useSalesData = (pagination, search) => {
   const fetcher = (...args) => fetch(...args).then((res) => res.json())
 
   const { data, error, isLoading } = useSWR(
@@ -95,7 +83,6 @@ export default function LocalSales() {
 
   const { salesData, error, isLoading } = useSalesData(
     pagination,
-    queries.sales,
     queries.search
   )
   useEffect(() => {
@@ -104,9 +91,18 @@ export default function LocalSales() {
     }
   }, [salesData])
 
-  const reloadSearch = () => {
+  const reloadSearch = (e) => {
+    e.preventDefault()
     setQueries({
       search: searchQuery,
+    })
+  }
+
+  const showAll = (e) => {
+    e.preventDefault()
+    setPagination(1)
+    setQueries({
+      search: '',
     })
   }
 
@@ -195,14 +191,30 @@ export default function LocalSales() {
   }
 
   return (
-    <div className="relative overflow-hidden bg-white shadow-md sm:rounded-lg my-10 mx-2 sm:mx-auto sm:w-4/5 md:w-3/4">
+    <div className="relative bg-white shadow-md sm:rounded-lg my-10 mx-2 sm:mx-auto sm:w-4/5 md:w-3/4">
       <TableHeader
         search={searchQuery}
         editSearch={setSearchQuery}
         searchButton={reloadSearch}
       />
-      <div className="flex flex-row justify-end px-2 py-4 w-full">
+      <div className="flex flex-row justify-between items-center px-2 py-4 w-full">
         <Pagination />
+        <div>{salesData.orders.lenght}</div>
+        <div className="flex flex-row justify-end gap-4 w-full">
+          <div>
+            <button
+              onClick={showAll}
+              className="bg-green-500 hover:bg-green-700 text-white font-semibold py-2 px-4 border border-green-500 hover:border-transparent rounded"
+            >
+              Ver Todos
+            </button>
+          </div>
+          <Link href={`/retiros/estadisticas`}>
+            <button class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
+              Estadísticas
+            </button>
+          </Link>
+        </div>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm text-left text-gray-500 ">
@@ -260,6 +272,7 @@ export default function LocalSales() {
                   </tr>
                 )
               })}
+
             {salesData.orders.map((sale) => {
               return (
                 <tr

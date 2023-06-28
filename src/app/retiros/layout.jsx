@@ -3,7 +3,7 @@ export default async function Cargar({
 }) {
   return (
     <>
-      <section className="h-full bg-gradient-to-b from-white via-blue-300 to-blue-800">
+      <section className="h-full min-h-screen bg-gradient-to-b from-white via-blue-300 to-blue-800">
         {children}
       </section>
     </>
