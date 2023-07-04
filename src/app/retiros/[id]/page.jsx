@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { use } from 'react'
 import { ReceivedPayment, Shipped } from './buttons'
+import { ModalEditProducts, ModalEditPayment } from './Modals'
 
 const BreadCrumbOrder = (id) => {
   return (
@@ -57,6 +58,18 @@ const ProductImage = {
     'https://d3ugyf2ht6aenh.cloudfront.net/stores/001/705/915/products/juego-para-amigos-y-pareja1-04a8074a73b8e6859b16728612235787-1024-1024.webp',
   'Año Nuevo':
     'https://d3ugyf2ht6aenh.cloudfront.net/stores/001/705/915/products/11-6abc5a8f6a44714a8516678314509320-1024-1024.webp',
+  'Buzo Tu Señal':
+    'https://d3ugyf2ht6aenh.cloudfront.net/stores/001/705/915/products/buzo-tu-senal_mesa-de-trabajo-1-011-2d3a5cd64013f2548a16883408519593-1024-1024.webp',
+  'Buzo Un Sueño':
+    'https://d3ugyf2ht6aenh.cloudfront.net/stores/001/705/915/products/buzo-un-sueno-051-41af2210747cb1c1cf16883397405736-1024-1024.webp',
+  'Remera Atenta':
+    'https://d3ugyf2ht6aenh.cloudfront.net/stores/001/705/915/products/remera-atenta-0411-fac604ce204852caa416883958442242-1024-1024.webp',
+  'Remera Preguntame':
+    'https://d3ugyf2ht6aenh.cloudfront.net/stores/001/705/915/products/remera-preguntame-031-9d3c35d9c19a0ba6d016883409951164-1024-1024.webp',
+  'Remera Club':
+    'https://d3ugyf2ht6aenh.cloudfront.net/stores/001/705/915/products/remera-club_mesa-de-trabajo-111-681542d295a27bc42c16883954762190-1024-1024.webp',
+  'Tote Bag':
+    'https://d3ugyf2ht6aenh.cloudfront.net/stores/001/705/915/products/totebag-en-palabras1-62073269754e91139916883297106646-1024-1024.webp',
 }
 
 const StatusInfo = ({ estado }) => {
@@ -170,7 +183,7 @@ export default function Page({ params }) {
   const tnData = use(tnFetch(data.order.externalId))
 
   return (
-    <section className="bg-white dark:bg-gray-900 mx-1 md:mx-10 my-4 py-16">
+    <section className="bg-white dark:bg-gray-900 mx-1 md:mx-10 my-4 py-16 rounded-md">
       <BreadCrumbOrder id={params.id} />
       <div className="px-6 md:px-10">
         <div className="flex flex-row flex-wrap justify-between items-center mt-10">
@@ -191,9 +204,11 @@ export default function Page({ params }) {
         </div>
         <div className="flex flex-col lg:flex-row gap-2">
           <div className="flex flex-col mt-6 pb-4 border rounded-md w-full lg:w-2/3 p-4">
-            <h3 className="text-lg font-semibold text-dark border-b w-full pb-2">
-              Productos
-            </h3>
+            <div className="flex flex-row justify-between border-b w-full pb-2 items-center">
+              <h3 className="text-lg font-semibold text-dark">Productos</h3>
+
+              <ModalEditProducts data={data.order} orderId={data.order.idEP} />
+            </div>
             <div className="my-auto ">
               {data.order.Products.map((product) => {
                 return (
@@ -204,14 +219,17 @@ export default function Page({ params }) {
                     <div className="flex h-full flex-row items-center">
                       <img
                         src={ProductImage[product.producto]}
-                        className="w-24 h-24 rounded-lg border border-gray-300"
+                        className="w-24 h-24 rounded-lg border border-gray-300 object-fit"
                       />
                       <div className="flex flex-col ml-4 justify-between gap-4 max-w-2/5">
                         <span className="font-bold text-dark dark:text-white">
-                          {product.producto}
+                          {product.producto}{' '}
+                          <span className="text-gray-500 text-sm font-light">
+                            {product.variante !== 'Unica' && product.variante}
+                          </span>
                         </span>
                         <span className="text-gray-500 text-sm">
-                          Juego de Cartas | ${' '}
+                          {product.categoria} | ${' '}
                           {product.precioUnitario.toLocaleString('es-AR')}
                         </span>
                       </div>
@@ -297,9 +315,15 @@ export default function Page({ params }) {
 
         <div className="flex flex-col lg:flex-row gap-2">
           <div className="flex flex-col mt-6 pb-4 border rounded-md w-full lg:w-2/3 p-4">
-            <h3 className="text-lg font-semibold text-dark border-b w-full pb-2">
-              Información de Pago
-            </h3>
+            <div className="flex flex-row justify-between border-b w-full pb-2 items-center">
+              <h3 className="text-lg font-semibold text-dark">
+                Información de Pago
+              </h3>
+              <ModalEditPayment
+                payment={data.order.Payments[0]}
+                orderId={data.order.idEP}
+              />
+            </div>
             <div className="mt-4 flex flex-col sm:flex-row justify-between h-full gap-4 md:gap-10">
               <div className="w-full md:w-1/2 flex flex-col justify-between h-full items-center">
                 <div className="flex flex-row justify-between w-full">
@@ -308,28 +332,34 @@ export default function Page({ params }) {
                     {data.order.Payments[0].tipoPago}
                   </p>
                 </div>
+                <div className="flex flex-row mt-4 justify-between w-full">
+                  <p className="text-gray-400 text-sm ">Cuenta Destino</p>
+                  <p className="text-gray-400 text-sm font-bold text-right">
+                    {data.order.Payments[0].cuentaDestino}
+                  </p>
+                </div>
                 <div className="mt-4 flex flex-row justify-between w-full items-center">
                   <p className="text-gray-400 text-sm ">Estado del Pago</p>
                   <p
                     className={`text-gray-400 text-sm font-bold rounded px-2 py-1
                     ${
-                      tnData.payment_status === 'paid' &&
+                      data.order.Payments[0].estado === 'paid' &&
                       'bg-green-100 text-green-800 text-sm'
                     }
                      ${
-                       (tnData.payment_status === 'abandonded' ||
-                         tnData.payment_status === 'voided' ||
-                         tnData.payment_status === 'refunded') &&
+                       (data.order.Payments[0].estado === 'abandonded' ||
+                         data.order.Payments[0].estado === 'voided' ||
+                         data.order.Payments[0].estado === 'refunded') &&
                        'bg-red-100 text-red-800 text-sm'
                      }
                       ${
-                        tnData.payment_status === 'pending' &&
+                        data.order.Payments[0].estado === 'pending' &&
                         'bg-yellow-100 text-yellow-800 text-sm'
                       }
                      
                     `}
                   >
-                    {PaymentStatus[tnData.payment_status]}
+                    {PaymentStatus[data.order.Payments[0].estado]}
                   </p>
                 </div>
                 <div className="mt-4 flex flex-row justify-between w-full">
@@ -347,9 +377,26 @@ export default function Page({ params }) {
                   <p className="text-gray-400 text-sm ">Subtotal</p>
                   <p className="text-gray-400 text-sm ">
                     ${' '}
-                    {Number(tnData.subtotal).toLocaleString('es-AR', {
+                    {Number(
+                      data.order.Products.reduce(
+                        (acc, product) => acc + product.precioTotal,
+                        0
+                      )
+                    ).toLocaleString('es-AR', {
                       minimumFractionDigits: 2,
                     })}
+                  </p>
+                </div>
+                <div className="flex flex-row justify-between w-full border-b pb-2">
+                  <p className="text-gray-400 text-sm ">Costo Envío</p>
+                  <p className="text-gray-400 text-sm ">
+                    ${' '}
+                    {Number(data.order.Shipment[0].pagoEnvio).toLocaleString(
+                      'es-AR',
+                      {
+                        minimumFractionDigits: 2,
+                      }
+                    )}
                   </p>
                 </div>
                 <div className="border-b  pb-2">
@@ -359,7 +406,15 @@ export default function Page({ params }) {
                     </p>
                     <p className="text-gray-400 text-sm ">
                       ${' '}
-                      {Number(tnData.discount_gateway).toLocaleString('es-AR', {
+                      {Number(
+                        data.order.Discounts.filter(
+                          (discount) =>
+                            discount.tipoDescuento === 'Metodo de Pago'
+                        ).reduce(
+                          (acc, discount) => acc + discount.montoDescuento,
+                          0
+                        )
+                      ).toLocaleString('es-AR', {
                         minimumFractionDigits: 2,
                       })}
                     </p>
@@ -371,7 +426,13 @@ export default function Page({ params }) {
                     <p className="text-gray-400 text-sm ">
                       ${' '}
                       {Number(
-                        tnData.discount - tnData.discount_gateway
+                        data.order.Discounts.filter(
+                          (discount) =>
+                            discount.tipoDescuento !== 'Metodo de Pago'
+                        ).reduce(
+                          (acc, discount) => acc + discount.montoDescuento,
+                          0
+                        )
                       ).toLocaleString('es-AR', {
                         minimumFractionDigits: 2,
                       })}
@@ -382,7 +443,17 @@ export default function Page({ params }) {
                   <p className="text-gray-400 font-bold break-words ">Total</p>
                   <p className="text-gray-400 text-sm font-bold">
                     ${' '}
-                    {Number(tnData.total).toLocaleString('es-AR', {
+                    {Number(
+                      data.order.Products.reduce(
+                        (acc, product) => acc + product.precioTotal,
+                        0
+                      ) +
+                        data.order.Shipment[0].pagoEnvio -
+                        data.order.Discounts.reduce(
+                          (acc, discount) => acc + discount.montoDescuento,
+                          0
+                        )
+                    ).toLocaleString('es-AR', {
                       minimumFractionDigits: 2,
                     })}
                   </p>
@@ -458,8 +529,9 @@ export default function Page({ params }) {
                   </span>
                 ) : (
                   <ReceivedPayment
-                    defaultAmount={tnData.total}
+                    defaultAmount={data.order.Payments[0].montoTotal}
                     paymentId={data.order.Payments[0].id}
+                    externalId={data.order.externalId}
                   />
                 )}
               </div>
@@ -495,13 +567,11 @@ async function getData(id) {
     `https://serverep-production.up.railway.app/api/ventas/order/${id}`,
     {
       next: {
+        cache: 'no-cache',
         tags: ['actualizar'],
       },
     }
   )
-  // The return value is *not* serialized
-  // You can return Date, Map, Set, etc.
-
   // Recommendation: handle errors
   if (!res.ok) {
     // This will activate the closest `error.js` Error Boundary
