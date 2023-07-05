@@ -405,7 +405,7 @@ export default function Page({ params }) {
                       Descuento Efectivo
                     </p>
                     <p className="text-gray-400 text-sm ">
-                      ${' '}
+                      (${' '}
                       {Number(
                         data.order.Discounts.filter(
                           (discount) =>
@@ -417,6 +417,7 @@ export default function Page({ params }) {
                       ).toLocaleString('es-AR', {
                         minimumFractionDigits: 2,
                       })}
+                      )
                     </p>
                   </div>
                   <div className="flex flex-row justify-between w-full ">
@@ -424,7 +425,7 @@ export default function Page({ params }) {
                       Otros Descuentos
                     </p>
                     <p className="text-gray-400 text-sm ">
-                      ${' '}
+                      (${' '}
                       {Number(
                         data.order.Discounts.filter(
                           (discount) =>
@@ -436,10 +437,11 @@ export default function Page({ params }) {
                       ).toLocaleString('es-AR', {
                         minimumFractionDigits: 2,
                       })}
+                      )
                     </p>
                   </div>
                 </div>
-                <div className="flex flex-row justify-between w-full ">
+                <div className="flex flex-row border-b  pb-2 justify-between w-full ">
                   <p className="text-gray-400 font-bold break-words ">Total</p>
                   <p className="text-gray-400 text-sm font-bold">
                     ${' '}
@@ -453,6 +455,37 @@ export default function Page({ params }) {
                           (acc, discount) => acc + discount.montoDescuento,
                           0
                         )
+                    ).toLocaleString('es-AR', {
+                      minimumFractionDigits: 2,
+                    })}
+                  </p>
+                </div>
+
+                <div className="flex flex-row justify-between w-full border-b  pb-2">
+                  <p className="text-gray-400 text-sm ">Pagado</p>
+                  <p className="text-gray-400 text-sm ">
+                    ${' '}
+                    {Number(
+                      data.order.Payments.filter(
+                        (payment) =>
+                          payment.estado === 'paid' ||
+                          payment.estado === 'Pagado'
+                      ).reduce((acc, payment) => acc + payment.montoTotal, 0)
+                    ).toLocaleString('es-AR', {
+                      minimumFractionDigits: 2,
+                    })}
+                  </p>
+                </div>
+                <div className="flex flex-row justify-between w-full">
+                  <p className="text-gray-400 text-sm">Restante</p>
+                  <p className="text-gray-400 text-sm">
+                    ${' '}
+                    {Number(
+                      data.order.Payments.filter(
+                        (payment) =>
+                          payment.estado === 'paid' ||
+                          payment.estado === 'Pagado'
+                      ).reduce((acc, payment) => acc + payment.montoTotal, 0)
                     ).toLocaleString('es-AR', {
                       minimumFractionDigits: 2,
                     })}

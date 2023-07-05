@@ -7,54 +7,63 @@ const productsList = [
     Desconectados: {
       categoria: 'Juegos',
       variante: ['Unica'],
+      precio: 8099,
     },
   },
   {
     Destapados: {
       categoria: 'Juegos',
       variante: ['Unica'],
+      precio: 8099,
     },
   },
   {
     'Año Nuevo': {
       categoria: 'Juegos',
       variante: ['Unica'],
+      precio: 4500,
     },
   },
   {
     'Buzo Un Sueño': {
       categoria: 'Merch',
       variante: ['Talle 1', 'Talle 2', 'Talle 3'],
+      precio: 27000,
     },
   },
   {
     'Buzo Tu Señal': {
       categoria: 'Merch',
       variante: ['Talle 1', 'Talle 2', 'Talle 3'],
+      precio: 27000,
     },
   },
   {
     'Remera Atenta': {
       categoria: 'Merch',
       variante: ['Talle 1', 'Talle 2', 'Talle 3'],
+      precio: 10500,
     },
   },
   {
     'Remera Club': {
       categoria: 'Merch',
       variante: ['Talle 1', 'Talle 2', 'Talle 3'],
+      precio: 10500,
     },
   },
   {
     'Remera Preguntame': {
       categoria: 'Merch',
       variante: ['Talle 1', 'Talle 2', 'Talle 3'],
+      precio: 10500,
     },
   },
   {
     'Tote Bag': {
       categoria: 'Merch',
       variante: ['Unica'],
+      precio: 3799,
     },
   },
 ]
@@ -65,18 +74,17 @@ export function ModalEditPayment({ payment, orderId }) {
     tipoPago: payment.tipoPago,
     cuentaDestino: payment.cuentaDestino,
   })
+  const [loading, setLoading] = useState(false)
   const props = { openModal, setOpenModal }
 
-  const PaymentTypes = ['Efectivo', 'Mercado Pago', 'Transferencia']
-
-  const Accounts = [
-    'Callipsian Recoleta',
-    'Efectivo Katy',
-    'Efectivo Belu',
-    'MP Belu',
+  const PaymentTypes = [
+    { Efectivo: 'Callipsian Recoleta' },
+    { 'Mercado Pago': 'MP Belu' },
+    { Transferencia: 'MP Belu' },
   ]
 
   const submitChange = async () => {
+    setLoading(true)
     const body = {
       paymentId: payment.id,
       orderId,
@@ -97,6 +105,9 @@ export function ModalEditPayment({ payment, orderId }) {
     }
 
     const json = await response.json()
+    console.log({ json })
+    props.setOpenModal(undefined)
+    setLoading(false)
   }
 
   return (
@@ -121,33 +132,23 @@ export function ModalEditPayment({ payment, orderId }) {
                 required
                 value={pago.tipoPago}
                 onChange={(e) => {
-                  setPago({ ...pago, tipoPago: e.target.value })
+                  setPago({
+                    ...pago,
+                    tipoPago: e.target.value,
+                    cuentaDestino: PaymentTypes.find(
+                      (paymentType) =>
+                        Object.keys(paymentType)[0] === e.target.value
+                    )[e.target.value],
+                  })
                 }}
               >
-                {PaymentTypes.map((paymentType) => (
-                  <option key={paymentType} value={paymentType}>
-                    {paymentType}
-                  </option>
-                ))}
-              </Select>
-            </div>
-            <div className="w-full">
-              <div className="mb-2 block">
-                <Label htmlFor="cuentaDestino" value="Cuenta" />
-              </div>
-              <Select
-                id="cuentaDestino"
-                required
-                value={pago.cuentaDestino}
-                onChange={(e) => {
-                  setPago({ ...pago, cuentaDestino: e.target.value })
-                }}
-              >
-                {Accounts.map((account) => (
-                  <option key={account} value={account}>
-                    {account}
-                  </option>
-                ))}
+                {PaymentTypes.map((paymentType) =>
+                  Object.keys(paymentType).map((key) => (
+                    <option key={key} value={key}>
+                      {key}
+                    </option>
+                  ))
+                )}
               </Select>
             </div>
           </div>
@@ -163,7 +164,9 @@ export function ModalEditPayment({ payment, orderId }) {
           <Button color="gray" onClick={() => props.setOpenModal(undefined)}>
             Cancelar
           </Button>
-          <Button onClick={submitChange}>Confirmar</Button>
+          <Button onClick={submitChange} isProcessing={loading}>
+            Confirmar
+          </Button>
         </Modal.Footer>
       </Modal>
     </>
@@ -173,12 +176,16 @@ export function ModalEditPayment({ payment, orderId }) {
 export function ModalEditProducts({ data, orderId }) {
   const [openModal, setOpenModal] = useState()
   const props = { openModal, setOpenModal }
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(false)
 
   const [productData, setProductData] = useState([...data.Products])
 
   const productNames = productsList.map((product) => Object.keys(product)[0])
 
   const modifyProducts = async () => {
+    setLoading(true)
+    setError(false)
     const modifiedProducts = productData.map((product) => ({
       ...product,
       precioTotal: product.precioUnitario * product.cantidad,
@@ -187,6 +194,34 @@ export function ModalEditProducts({ data, orderId }) {
       )[product.producto].categoria,
       moneda: 'ARS',
     }))
+
+    const productNames = modifiedProducts.map((product) => product.producto)
+    const uniqueProductNames = [...new Set(productNames)]
+    if (productNames.length !== uniqueProductNames.length) {
+      setError(
+        'Existen dos productos con el mismo nombre. Por favor dejar sólo uno de ellos.'
+      )
+      setLoading(false)
+      return
+    }
+
+    const zeroQuantity = modifiedProducts.find(
+      (product) => product.cantidad === 0
+    )
+    if (zeroQuantity) {
+      setError('Existen productos con cantidad 0. Por favor eliminarlos.')
+      setLoading(false)
+      return
+    }
+
+    const zeroPrice = modifiedProducts.find(
+      (product) => product.precioUnitario === 0
+    )
+    if (zeroPrice) {
+      setError('Existen productos con precio 0. Por favor eliminarlos.')
+      setLoading(false)
+      return
+    }
 
     // setProductData(modifiedProducts)
     // return
@@ -211,6 +246,9 @@ export function ModalEditProducts({ data, orderId }) {
 
     const json = await response.json()
     console.log({ json })
+    // setError(true)
+    props.setOpenModal(undefined)
+    setLoading(false)
   }
 
   const closeModal = () => {
@@ -252,6 +290,7 @@ export function ModalEditProducts({ data, orderId }) {
                       onChange={(e) => {
                         const newProductData = [...productData]
                         newProductData[index].producto = e.target.value
+
                         if (
                           e.target.value === 'Desconectados' ||
                           e.target.value === 'Destapados' ||
@@ -259,6 +298,12 @@ export function ModalEditProducts({ data, orderId }) {
                         ) {
                           newProductData[index].variante = 'Unica'
                         }
+                        newProductData[index].precioUnitario =
+                          productsList.find(
+                            (product) =>
+                              Object.keys(product)[0] ===
+                              productData[index].producto
+                          )[productData[index].producto].precio
                         setProductData(newProductData)
                       }}
                     >
@@ -339,7 +384,14 @@ export function ModalEditProducts({ data, orderId }) {
                         id="precio"
                         type="number"
                         addon="$"
-                        defaultValue={product.precioUnitario}
+                        // defaultValue={
+                        //   productsList.find(
+                        //     (product) =>
+                        //       Object.keys(product)[0] ===
+                        //       productData[index].producto
+                        //   )[productData[index].producto].precio
+                        // }
+                        value={product.precioUnitario}
                         onBlur={(e) => {
                           const newProductData = [...productData]
                           newProductData[index].precioUnitario = e.target.value
@@ -351,7 +403,7 @@ export function ModalEditProducts({ data, orderId }) {
                     </div>
                   </div>
 
-                  <div className="text-center w-full max-w-[400px] md:w-auto">
+                  <div className="text-center w-full max-w-[400px] md:w-auto ">
                     {index === 0 && (
                       <div className="mb-2 hidden md:block">
                         <Label htmlFor="variante" value="Eliminar" />
@@ -397,9 +449,9 @@ export function ModalEditProducts({ data, orderId }) {
                   })
                   setProductData(newProductData)
                 }}
-                className="w-full md:w-auto border-radius-2xl"
+                className="w-full max-w-[400px] md:w-auto mx-auto border-radius-2xl "
               >
-                <svg
+                {/* <svg
                   className="w-6 h-6"
                   aria-hidden="true"
                   xmlns="http://www.w3.org/2000/svg"
@@ -413,17 +465,29 @@ export function ModalEditProducts({ data, orderId }) {
                     stroke-width="2"
                     d="M9 1v16M1 9h16"
                   />
-                </svg>
+                </svg> */}
+                Agregar Producto
               </Button>
             </div>
-            <div className="flex justify-between gap-4 mt-8">
+            <div className="flex justify-between gap-4 mt-8 items-center">
               <Button color="failure" onClick={closeModal}>
                 Cancelar
               </Button>
-              <Button color="gray" onClick={modifyProducts}>
+              <Button
+                color="gray"
+                onClick={modifyProducts}
+                isProcessing={loading}
+              >
                 Modificar
               </Button>
             </div>
+          </div>
+          <div>
+            {error && (
+              <div className="mt-4 mx-auto text-center text-red-500 font-semibold text-sm">
+                {error}
+              </div>
+            )}
           </div>
         </Modal.Body>
       </Modal>

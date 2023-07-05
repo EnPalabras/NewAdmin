@@ -1,4 +1,5 @@
 'use client'
+import { Button } from 'flowbite-react'
 import { useState } from 'react'
 
 export function ReceivedPayment({ defaultAmount, paymentId, externalId }) {
@@ -6,6 +7,7 @@ export function ReceivedPayment({ defaultAmount, paymentId, externalId }) {
   const [cobro, setCobro] = useState(defaultAmount)
   const [vuelto, setVuelto] = useState(0)
   const [amount, setAmount] = useState(defaultAmount)
+  const [loading, setLoading] = useState(false)
 
   const handleDateChange = (value) => {
     setDate(new Date(value).toISOString().slice(0, 10))
@@ -25,6 +27,7 @@ export function ReceivedPayment({ defaultAmount, paymentId, externalId }) {
   }
 
   const setAsPaid = async () => {
+    setLoading(true)
     const body = {
       externalId,
       paymentId,
@@ -45,28 +48,29 @@ export function ReceivedPayment({ defaultAmount, paymentId, externalId }) {
     }
     const json = await response.json()
 
+    setLoading(false)
+
     console.log({ json })
   }
 
   return (
     <div className="flex flex-col w-full">
       <div className="flex flex-col gap-2 justify-evenly items-center w-full">
-        <div className="flex flex-col w-full max-w-[400px] mx-auto items-center justify-center">
-          <label className="text-gray-700 text-sm font-bold mb-2">
-            Fecha de Pago
-          </label>
-          <input
-            type="date"
-            className="w-full border-2 border-gray-300 bg-transparent h-10 px-5 rounded-md  focus:outline-none text-center"
-            value={date}
-            onChange={(e) => handleDateChange(e.target.value)}
-          />
-        </div>
-
         <div className="flex flex-col w-full gap-2 max-w-[400px] mx-auto items-center justify-center">
           <div className="flex flex-col md:flex-row gap-2 w-full items-center justify-between">
             <label className="text-gray-700 text-base font-bold mb-2">
-              Cobro
+              Fecha de Pago
+            </label>
+            <input
+              type="date"
+              className="w-full max-w-[200px] border-2 border-gray-300 bg-transparent h-10 px-5 rounded-md  focus:outline-none text-center"
+              value={date}
+              onChange={(e) => handleDateChange(e.target.value)}
+            />
+          </div>
+          <div className="flex flex-col md:flex-row gap-2 w-full items-center justify-between">
+            <label className="text-gray-700 text-base font-bold mb-2">
+              Monto Recibido
             </label>
             <input
               type="number"
@@ -88,7 +92,7 @@ export function ReceivedPayment({ defaultAmount, paymentId, externalId }) {
           </div>
           <div className="flex flex-col md:flex-row gap-2 w-full items-center justify-between">
             <label className="text-gray-700 text-base font-bold mb-2">
-              Monto Recibido
+              Total Neto
             </label>
             <input
               type="number"
@@ -100,12 +104,13 @@ export function ReceivedPayment({ defaultAmount, paymentId, externalId }) {
       </div>
 
       <div className="my-4 w-full items-center justify-center">
-        <button
-          className="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+        <Button
+          className="w-full bg-green-500 hover:bg-green-700 text-white font-bold rounded"
           onClick={setAsPaid}
+          isProcessing={loading}
         >
-          Marcar Pago Recibido
-        </button>
+          <p className="text-base font-semibold">Marcar Pago Recibido</p>
+        </Button>
       </div>
     </div>
   )
@@ -113,12 +118,13 @@ export function ReceivedPayment({ defaultAmount, paymentId, externalId }) {
 
 export function Shipped({ externalId }) {
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10))
-
+  const [loading, setLoading] = useState(false)
   const handleDateChange = (value) => {
     setDate(new Date(value).toISOString().slice(0, 10))
   }
 
   const setAsShipped = async () => {
+    setLoading(true)
     const response = await fetch('/api/fulfilled', {
       method: 'POST',
       headers: {
@@ -131,14 +137,14 @@ export function Shipped({ externalId }) {
       console.log('response ok')
     }
 
-    console.log({ response })
+    setLoading(false)
   }
 
   return (
     <div className="flex flex-col w-full h-full justify-between">
       <div className="flex flex-col lg:flex-row gap-2 justify-evenly w-full">
         <div className="flex flex-col w-full lg:w-1/2 items-center justify-center">
-          <label className="text-gray-700 text-sm font-bold mb-2">
+          <label className="text-gray-700 text-base font-bold mb-2">
             Fecha de Entrega
           </label>
           <input
@@ -152,9 +158,12 @@ export function Shipped({ externalId }) {
 
       <div className="my-4 w-full items-center justify-center">
         <form onSubmit={setAsShipped}>
-          <button className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-            Marcar Entregado
-          </button>
+          <Button
+            className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold  rounded"
+            isProcessing={loading}
+          >
+            <p className="text-base font-semibold">Marcar Entregado</p>
+          </Button>
         </form>
       </div>
     </div>
