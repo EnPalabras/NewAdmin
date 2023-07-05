@@ -551,8 +551,6 @@ export function ModalTwoPayments({ payment, orderId }) {
         onClose={() => props.setOpenModal(undefined)}
       >
         <Modal.Header>Información de Pago</Modal.Header>
-        {JSON.stringify(payments)}
-        {JSON.stringify(comentarios)}
 
         <Modal.Body>
           <div className="flex flex-col w-full justify-between items-center gap-4">

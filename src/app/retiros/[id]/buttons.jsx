@@ -123,7 +123,8 @@ export function Shipped({ externalId }) {
     setDate(new Date(value).toISOString().slice(0, 10))
   }
 
-  const setAsShipped = async () => {
+  const setAsShipped = async (e) => {
+    e.preventDefault()
     setLoading(true)
     const response = await fetch('/api/fulfilled', {
       method: 'POST',
@@ -157,14 +158,13 @@ export function Shipped({ externalId }) {
       </div>
 
       <div className="my-4 w-full items-center justify-center">
-        <form onSubmit={setAsShipped}>
-          <Button
-            className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold  rounded"
-            isProcessing={loading}
-          >
-            <p className="text-base font-semibold">Marcar Entregado</p>
-          </Button>
-        </form>
+        <Button
+          className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold  rounded"
+          isProcessing={loading}
+          onClick={setAsShipped}
+        >
+          <p className="text-base font-semibold">Marcar Entregado</p>
+        </Button>
       </div>
     </div>
   )
