@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { use } from 'react'
 import { ReceivedPayment, Shipped } from './buttons'
-import { ModalEditProducts, ModalEditPayment } from './Modals'
+import { ModalEditProducts, ModalEditPayment, ModalTwoPayments } from './Modals'
 
 const BreadCrumbOrder = (id) => {
   return (
@@ -319,25 +319,29 @@ export default function Page({ params }) {
               <h3 className="text-lg font-semibold text-dark">
                 Información de Pago
               </h3>
-              <ModalEditPayment
-                payment={data.order.Payments[0]}
-                orderId={data.order.idEP}
-              />
+              <div className="flex flex-row gap-4">
+                <ModalTwoPayments
+                  payment={data.order.Payments}
+                  orderId={data.order.idEP}
+                />
+                <ModalEditPayment
+                  payment={data.order.Payments[0]}
+                  orderId={data.order.idEP}
+                />
+              </div>
             </div>
             <div className="mt-4 flex flex-col sm:flex-row justify-between h-full gap-4 md:gap-10">
               <div className="w-full md:w-1/2 flex flex-col justify-between h-full items-center">
                 <div className="flex flex-row justify-between w-full">
                   <p className="text-gray-400 text-sm ">Método de Pago</p>
                   <p className="text-gray-400 text-sm font-bold text-right">
-                    {data.order.Payments[0].tipoPago}
+                    {data.order.Payments[0].tipoPago}{' '}
+                    {data.order.Payments[1] && data.order.Payments[1].tipoPago}
+                    {data.order.Payments[1] &&
+                      `/ ${data.order.Payments[1].tipoPago}`}
                   </p>
                 </div>
-                <div className="flex flex-row mt-4 justify-between w-full">
-                  <p className="text-gray-400 text-sm ">Cuenta Destino</p>
-                  <p className="text-gray-400 text-sm font-bold text-right">
-                    {data.order.Payments[0].cuentaDestino}
-                  </p>
-                </div>
+
                 <div className="mt-4 flex flex-row justify-between w-full items-center">
                   <p className="text-gray-400 text-sm ">Estado del Pago</p>
                   <p

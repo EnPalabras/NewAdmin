@@ -25,9 +25,11 @@ export async function middleware(request) {
   if (
     pathname !== '/login' &&
     pathname !== '/register' &&
-    pathname !== '/retiros'
+    pathname !== '/retiros' &&
+    !pathname.includes('/retiros')
   ) {
-    if (token && token.email === 'probandoestemail@gmail.com') {
+    if (token && token.email === 'agusiglesAias72@gmail.com') {
+      console.log('token.email', token.email)
       const url = new URL(`/retiros`, request.url)
       return NextResponse.redirect(url)
     }
@@ -42,5 +44,12 @@ export async function middleware(request) {
 
 // Falta agregar el middleware para proteger rutas
 export const config = {
-  matcher: ['/login/:path*', '/register/:path*', '/'],
+  matcher: [
+    '/login/:path*',
+    '/register/:path*',
+    '/retiros',
+    '/',
+    '/ventas/:path*',
+    '/ventas',
+  ],
 }

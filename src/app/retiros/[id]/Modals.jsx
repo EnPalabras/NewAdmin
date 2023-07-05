@@ -1,5 +1,12 @@
 'use client'
-import { Button, Label, Modal, Select, TextInput } from 'flowbite-react'
+import {
+  Button,
+  Label,
+  Modal,
+  Select,
+  TextInput,
+  Textarea,
+} from 'flowbite-react'
 import { useState } from 'react'
 
 const productsList = [
@@ -493,4 +500,251 @@ export function ModalEditProducts({ data, orderId }) {
       </Modal>
     </>
   )
+}
+
+export function ModalTwoPayments({ payment, orderId }) {
+  const [openModal, setOpenModal] = useState()
+  const [loading, setLoading] = useState(false)
+  const [payments, setPayments] = useState([...payment])
+  const props = { openModal, setOpenModal }
+  const [comentarios, setComentarios] = useState('')
+
+  const PaymentTypes = [
+    { Efectivo: 'Callipsian Recoleta' },
+    { 'Mercado Pago': 'MP Belu' },
+    { Transferencia: 'MP Belu' },
+  ]
+
+  const submitPayments = async () => {
+    setLoading(true)
+    const body = {
+      payments,
+      orderId,
+    }
+
+    const response = await fetch('/api/payments', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    })
+
+    if (response.ok) {
+      window.location.reload()
+    }
+
+    const json = await response.json()
+    console.log({ json })
+    props.setOpenModal(undefined)
+    setLoading(false)
+  }
+
+  return (
+    <>
+      <Button onClick={() => props.setOpenModal('dismissible')} color="warning">
+        Orden con 2 Pagos
+      </Button>
+      <Modal
+        dismissible
+        show={props.openModal === 'dismissible'}
+        onClose={() => props.setOpenModal(undefined)}
+      >
+        <Modal.Header>Información de Pago</Modal.Header>
+        {JSON.stringify(payments)}
+        {JSON.stringify(comentarios)}
+
+        <Modal.Body>
+          <div className="flex flex-col w-full justify-between items-center gap-4">
+            {payments.map((payment, index) => (
+              <div
+                className="flex flex-row w-full justify-between gap-4 items-center"
+                key={index}
+              >
+                <div className="w-auto">
+                  <div className="mb-2 block">
+                    <Label htmlFor="estado" value="Estado" />
+                  </div>
+                  <p
+                    className={`text-gray-400 text-sm font-bold rounded  px-2 py-2.5 text-center
+                    ${
+                      payment.estado === 'paid' &&
+                      'bg-green-100 text-green-800 text-sm'
+                    }
+                     ${
+                       (payment.estado === 'abandonded' ||
+                         payment.estado === 'voided' ||
+                         payment.estado === 'refunded') &&
+                       'bg-red-100 text-red-800 text-sm'
+                     }
+                      ${
+                        payment.estado === 'pending' &&
+                        'bg-yellow-100 text-yellow-800 text-sm'
+                      }
+                     
+                    `}
+                  >
+                    {PaymentStatus[payment.estado]}
+                  </p>
+                </div>
+                <div className="w-auto">
+                  <div className="mb-2 block">
+                    <Label htmlFor="tipoPago" value="Método de Pago" />
+                  </div>
+
+                  <Select
+                    id="tipoPago"
+                    required
+                    value={payment.tipoPago}
+                    onChange={(e) => {
+                      const newPayments = [...payments]
+                      newPayments[index].tipoPago = e.target.value
+                      newPayments[index].cuentaDestino = PaymentTypes.find(
+                        (paymentType) =>
+                          Object.keys(paymentType)[0] === e.target.value
+                      )[e.target.value]
+                      setPayments(newPayments)
+                    }}
+                  >
+                    {PaymentTypes.map((paymentType) =>
+                      Object.keys(paymentType).map((key) => (
+                        <option key={key} value={key}>
+                          {key}
+                        </option>
+                      ))
+                    )}
+                  </Select>
+                </div>
+                <div className="w-auto max-w-[400px]">
+                  <div className="mb-2 block">
+                    <Label htmlFor="estado" value="Monto a Recibir" />
+                  </div>
+                  <TextInput
+                    id="estado"
+                    type="number"
+                    addon="$"
+                    defaultValue={payment.montoTotal}
+                    onBlur={(e) => {
+                      const newPayments = [...payments]
+                      newPayments[index].montoTotal = e.target.value
+                      setPayments(newPayments)
+                    }}
+                  />
+                </div>
+                <div>
+                  <div className="mb-2 block">
+                    <Label htmlFor="estado" value="Eliminar" />
+                  </div>
+                  <Button
+                    onClick={() => {
+                      const newPayments = [...payments]
+                      newPayments.splice(index, 1)
+                      setPayments(newPayments)
+                    }}
+                    color="failure"
+                    className="w-full md:w-auto"
+                  >
+                    <svg
+                      className="w-4 h-5 text-gray-800 dark:text-white"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="white"
+                      viewBox="0 0 18 20"
+                    >
+                      <path d="M17 4h-4V2a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2H1a1 1 0 0 0 0 2h1v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1a1 1 0 1 0 0-2ZM7 2h4v2H7V2Zm1 14a1 1 0 1 1-2 0V8a1 1 0 0 1 2 0v8Zm4 0a1 1 0 0 1-2 0V8a1 1 0 0 1 2 0v8Z" />
+                    </svg>
+                  </Button>
+                </div>
+              </div>
+            ))}
+            <div className="w-full flex flex-row justify-between items-center">
+              <Button
+                onClick={() => {
+                  const newPayments = [...payments]
+                  newPayments.push({
+                    estado: 'pending',
+                    tipoPago: 'Efectivo',
+                    cuentaDestino: 'Callipsian Recoleta',
+                    montoTotal: 0,
+                    montoRecibido: 0,
+                  })
+                  setPayments(newPayments)
+                }}
+                className="w-1/3 mx-auto py-2 border-radius-2xl "
+              >
+                Agregar Pago
+              </Button>
+              <div className="w-full flex flex-col justify-end">
+                <div className="w-full flex flex-row justify-end">
+                  <p className="text-black text-md font-bold rounded  px-2 py-1 text-center">
+                    Total a Recibir
+                  </p>
+                  <p className="text-black text-md font-bold rounded  px-2 py-1 text-center">
+                    ${' '}
+                    {payments
+                      .reduce(
+                        (acc, payment) => acc + parseInt(payment.montoRecibido),
+                        0
+                      )
+                      .toLocaleString('es-AR')}
+                  </p>
+                </div>
+                <div className="w-full flex flex-row justify-end">
+                  <p className="text-black text-md font-bold rounded  px-2 py-1 text-center">
+                    Total de la Orden
+                  </p>
+                  <p className="text-black text-md font-bold rounded  px-2 py-1 text-center">
+                    ${' '}
+                    {payments
+                      .reduce(
+                        (acc, payment) => acc + parseInt(payment.montoTotal),
+                        0
+                      )
+                      .toLocaleString('es-AR')}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="w-full px-1">
+              <Textarea
+                placeholder="Observaciones"
+                // value={comentarios}
+                defaultValue={comentarios}
+                onBlur={(e) => setComentarios(e.target.value)}
+              />
+            </div>
+          </div>
+        </Modal.Body>
+        <Modal.Footer className="flex flex-row justify-between w-full">
+          <Button
+            color="gray"
+            className="py-0.5"
+            onClick={() => {
+              props.setOpenModal(undefined)
+              setPayments([...payment])
+            }}
+          >
+            Cancelar
+          </Button>
+          <Button
+            className="w-auto bg-green-500 hover:bg-green-700 py-0.5 text-white font-bold rounded"
+            onClick={submitPayments}
+            isProcessing={loading}
+          >
+            <p className="text-base font-semibold">Marcar Pago Recibido</p>
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
+  )
+}
+
+const PaymentStatus = {
+  authorized: 'Autorizado',
+  pending: 'Pendiente',
+  paid: 'Pagado',
+  abandoned: 'Abandonado',
+  refunded: 'Reintegrado',
+  voided: 'Rechazado',
 }
