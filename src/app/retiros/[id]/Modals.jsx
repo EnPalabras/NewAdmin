@@ -1,9 +1,11 @@
 'use client'
 import {
   Button,
+  Checkbox,
   Label,
   Modal,
   Select,
+  Table,
   TextInput,
   Textarea,
 } from 'flowbite-react'
@@ -14,21 +16,21 @@ const productsList = [
     Desconectados: {
       categoria: 'Juegos',
       variante: ['Unica'],
-      precio: 8099,
+      precio: 7830,
     },
   },
   {
     Destapados: {
       categoria: 'Juegos',
       variante: ['Unica'],
-      precio: 8099,
+      precio: 7830,
     },
   },
   {
     'Año Nuevo': {
       categoria: 'Juegos',
       variante: ['Unica'],
-      precio: 4500,
+      precio: 3950,
     },
   },
   {
@@ -502,10 +504,10 @@ export function ModalEditProducts({ data, orderId }) {
   )
 }
 
-export function ModalTwoPayments({ payment, orderId }) {
+export function ModalTwoPayments({ order }) {
   const [openModal, setOpenModal] = useState()
   const [loading, setLoading] = useState(false)
-  const [payments, setPayments] = useState([...payment])
+  const [payments, setPayments] = useState([...order.Payments])
   const props = { openModal, setOpenModal }
   const [comentarios, setComentarios] = useState('')
 
@@ -517,12 +519,28 @@ export function ModalTwoPayments({ payment, orderId }) {
 
   const submitPayments = async () => {
     setLoading(true)
+    const parsedPayments = payments.map((payment) => ({
+      ...payment,
+      idEP: order.idEP,
+      fechaPago: payment.fechaPago
+        ? payment.fechaPago
+        : new Date().toISOString(),
+      fechaLiquidacion: payment.fechaLiquidacion
+        ? payment.fechaLiquidacion
+        : new Date().toISOString(),
+      moneda: 'ARS',
+      cuotas: 1,
+    }))
+
     const body = {
-      payments,
-      orderId,
+      payments: parsedPayments,
+      orderId: order.idEP,
+      externalId: order.externalId,
+      date: new Date().toISOString(),
+      amountReceived: order.montoTotal,
     }
 
-    const response = await fetch('/api/payments', {
+    const response = await fetch('/api/payments/many', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -535,7 +553,6 @@ export function ModalTwoPayments({ payment, orderId }) {
     }
 
     const json = await response.json()
-    console.log({ json })
     props.setOpenModal(undefined)
     setLoading(false)
   }
@@ -548,11 +565,20 @@ export function ModalTwoPayments({ payment, orderId }) {
       <Modal
         dismissible
         show={props.openModal === 'dismissible'}
-        onClose={() => props.setOpenModal(undefined)}
+        onClose={() => {
+          props.setOpenModal(undefined)
+          setPayments([...order.Payments])
+        }}
       >
         <Modal.Header>Información de Pago</Modal.Header>
 
         <Modal.Body>
+          <div className="flex flex-row w-full justify-between gap-4 items-center">
+            <p className="text-red-400 text-sm rounded mb-4 w-full text-center">
+              ¡Atención! Únicamente utilizar esta opción en caso de que el
+              cliente pague con dos métodos de pago distintos.
+            </p>
+          </div>
           <div className="flex flex-col w-full justify-between items-center gap-4">
             {payments.map((payment, index) => (
               <div
@@ -624,6 +650,7 @@ export function ModalTwoPayments({ payment, orderId }) {
                     defaultValue={payment.montoTotal}
                     onBlur={(e) => {
                       const newPayments = [...payments]
+                      newPayments[index].montoRecibido = e.target.value
                       newPayments[index].montoTotal = e.target.value
                       setPayments(newPayments)
                     }}
@@ -681,10 +708,12 @@ export function ModalTwoPayments({ payment, orderId }) {
                     ${' '}
                     {payments
                       .reduce(
-                        (acc, payment) => acc + parseInt(payment.montoRecibido),
+                        (acc, payment) => acc + parseFloat(payment.montoTotal),
                         0
                       )
-                      .toLocaleString('es-AR')}
+                      .toLocaleString('es-AR', {
+                        minimumFractionDigits: 2,
+                      })}
                   </p>
                 </div>
                 <div className="w-full flex flex-row justify-end">
@@ -693,14 +722,22 @@ export function ModalTwoPayments({ payment, orderId }) {
                   </p>
                   <p className="text-black text-md font-bold rounded  px-2 py-1 text-center">
                     ${' '}
-                    {payments
-                      .reduce(
-                        (acc, payment) => acc + parseInt(payment.montoTotal),
-                        0
-                      )
-                      .toLocaleString('es-AR')}
+                    {order.montoTotal.toLocaleString('es-AR', {
+                      minimumFractionDigits: 2,
+                    })}
                   </p>
                 </div>
+
+                {payments.reduce(
+                  (acc, payment) => acc + parseFloat(payment.montoTotal),
+                  0
+                ) > order.montoTotal && (
+                  <div className="w-full flex flex-row justify-end">
+                    <p className="text-red-400 text-xs  px-2 py-1 text-center">
+                      El monto recibido es mayor al total de la orden
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -720,7 +757,7 @@ export function ModalTwoPayments({ payment, orderId }) {
             className="py-0.5"
             onClick={() => {
               props.setOpenModal(undefined)
-              setPayments([...payment])
+              setPayments([...order.Payments])
             }}
           >
             Cancelar
@@ -732,6 +769,143 @@ export function ModalTwoPayments({ payment, orderId }) {
           >
             <p className="text-base font-semibold">Marcar Pago Recibido</p>
           </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
+  )
+}
+
+export function ModalHandleChange({ order }) {
+  const [openModal, setOpenModal] = useState()
+  const [loading, setLoading] = useState(false)
+  const props = { openModal, setOpenModal }
+  const [comentarios, setComentarios] = useState('')
+  const [originalProducts, setOriginalProducts] = useState([...order.Products])
+  const [products, setProducts] = useState([])
+
+  return (
+    <>
+      <Button
+        onClick={() => props.setOpenModal('dismissible')}
+        className="bg-purple-500 hover:bg-purple-700 py-2 text-white font-bold rounded"
+      >
+        Gestionar Cambio
+      </Button>
+      <Modal
+        dismissible
+        show={props.openModal === 'dismissible'}
+        onClose={() => props.setOpenModal(undefined)}
+      >
+        <Modal.Header>Gestionar Cambios</Modal.Header>
+        <Modal.Body>
+          <div className="flex flex-col w-full justify-between gap-4 items-center">
+            <p className="text-gray-600 text-sm rounded mb-4 w-full text-center">
+              Utilizar esta opción en caso de que un cliente que ya haya
+              retirado su pedido quiera cambiar algún producto.
+            </p>
+            {JSON.stringify(products)}
+            <div className="flex flex-col w-full  pl-2 justify-between  gap-4">
+              <p className=" text-left">Productos disponibles para Cambiar</p>
+
+              {order.Products.map((product, index) => (
+                <div
+                  className="flex flex-row w-full text-gray-400 justify-between gap-4 items-center"
+                  key={index}
+                >
+                  <p>
+                    {product.producto} - {product.variante} - {product.cantidad}{' '}
+                    - ${product.precioUnitario}
+                  </p>
+                </div>
+              ))}
+
+              <Table hoverable>
+                <Table.Head>
+                  <Table.HeadCell className="p-4">
+                    <Checkbox disabled />
+                  </Table.HeadCell>
+                  <Table.HeadCell>Producto</Table.HeadCell>
+                  <Table.HeadCell>Variante</Table.HeadCell>
+                  <Table.HeadCell>Cantidad</Table.HeadCell>
+                  <Table.HeadCell>Precio</Table.HeadCell>
+                </Table.Head>
+
+                <Table.Body className="divide-y divide-gray-200">
+                  {originalProducts.map((product, index) => (
+                    <Table.Row key={product.id}>
+                      <Table.Cell className="p-4">
+                        <Checkbox
+                          id={product.id}
+                          className="w-4 h-4 text-gray-800 dark:text-white"
+                          value={product.id}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              const newProducts = [...products]
+                              newProducts.push(product)
+                              setProducts(newProducts)
+                            } else {
+                              const newProducts = [...products]
+                              const index = newProducts.findIndex(
+                                (newProduct) => newProduct.id === product.id
+                              )
+                              newProducts.splice(index, 1)
+                              setProducts(newProducts)
+                            }
+                          }}
+                        />
+                      </Table.Cell>
+                      <Table.Cell>{product.producto}</Table.Cell>
+                      <Table.Cell>{product.variante}</Table.Cell>
+                      <Table.Cell>
+                        <input
+                          type="number"
+                          className="w-20 h-8 text-gray-800 text-center dark:text-white border border-gray-300 dark:border-gray-700 rounded-md shadow-sm "
+                          defaultValue={product.cantidad}
+                          onChange={(e) => {
+                            const newProducts = [...products]
+                            newProducts[index].cantidad = e.target.value
+                            newProducts[index].precioTotal =
+                              e.target.value * product.precioUnitario
+                            setProducts(newProducts)
+                          }}
+                        />
+                      </Table.Cell>
+                      <Table.Cell className="text-sm">
+                        {<p className="">$ {product.precioUnitario}</p>}
+                      </Table.Cell>
+                    </Table.Row>
+                  ))}
+                </Table.Body>
+              </Table>
+              <div className="flex flex-end w-full">
+                <p className="text-black text-md font-bold rounded  px-2 py-1 text-right">
+                  Crédito Total ${' '}
+                  {(
+                    order.Payments.reduce(
+                      (acc, payment) => acc + parseFloat(payment.montoTotal),
+                      0
+                    ) -
+                    order.Shipment.reduce(
+                      (acc, shipment) => acc + parseFloat(shipment.pagoEnvio),
+                      0
+                    ) -
+                    products.reduce(
+                      (acc, product) => acc + parseFloat(product.precioTotal),
+                      0
+                    )
+                  ).toLocaleString('es-AR', {
+                    minimumFractionDigits: 2,
+                  })}
+                </p>
+              </div>
+            </div>
+          </div>
+        </Modal.Body>
+        <Modal.Footer className="flex flex-row justify-between w-full">
+          <Button color="gray" onClick={() => props.setOpenModal(undefined)}>
+            Cancelar
+          </Button>
+          <Button isProcessing={loading}>Confirmar</Button>
         </Modal.Footer>
       </Modal>
     </>

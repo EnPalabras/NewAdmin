@@ -4,14 +4,15 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 import { redirect } from 'next/navigation'
-import { Toast } from 'flowbite-react'
+import { Button, Toast } from 'flowbite-react'
+import { ModalAddSale } from './[id]/Modals'
 
 export const TableHeader = ({ search, editSearch, searchButton }) => {
   return (
     <div className="flex flex-col px-2 py-4 w-full justify-between gap-y-2 gap-2 md:gap-4">
       <form onSubmit={searchButton}>
         <div className="flex flex-row justify-between gap-2 w-full">
-          <div className="relative w-3/4 items-center">
+          <div className="relative w-3/5 items-center">
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
               <svg
                 aria-hidden="true"
@@ -40,10 +41,17 @@ export const TableHeader = ({ search, editSearch, searchButton }) => {
               required
             />
           </div>
-          <div className="flex flex-row w-1/4 justify-between gap-2">
+          <div className="flex flex-row w-1/5 justify-between gap-2">
             <button className="flex items-center w-full  justify-center px-4 py-4 text-sm font-medium text-gray-900 rounded-lg bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600 dark:placeholder-gray-400 ">
               Buscar
             </button>
+          </div>
+          <div className="flex flex-row w-1/5 justify-between gap-2">
+            <Link href={`/retiros/nueva-venta`} className="w-full">
+              <Button className="w-full bg-blue-500 hover:bg-blue-700 py-2 text-white font-bold rounded">
+                Agregar Venta
+              </Button>
+            </Link>
           </div>
         </div>
       </form>
@@ -280,7 +288,8 @@ export default function LocalSales() {
                   className="border-b dark:border-gray-600 hover:bg-gray-100"
                 >
                   <td className="py-4 text-center ">
-                    {sale.Payments[0].estado !== 'paid' &&
+                    {sale.Payments[0] &&
+                    sale.Payments[0].estado !== 'paid' &&
                     sale.Payments[0].estado !== 'Pagado' ? (
                       <span
                         className={`bg-yellow-100 text-yellow-800 text-sm whitespace-nowrap font-medium px-2 py-1 text-center rounded `}

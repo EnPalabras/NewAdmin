@@ -34,7 +34,6 @@ export function ReceivedPayment({ defaultAmount, paymentId, externalId }) {
       date: new Date(date).toISOString(),
       amountReceived: amount,
     }
-    console.log({ body })
     const response = await fetch('/api/paid', {
       method: 'POST',
       headers: {
@@ -135,7 +134,7 @@ export function Shipped({ externalId }) {
     })
 
     if (response.ok) {
-      console.log('response ok')
+      window.location.reload()
     }
 
     setLoading(false)

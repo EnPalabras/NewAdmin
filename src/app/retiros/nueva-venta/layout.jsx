@@ -1,5 +1,5 @@
-export const metadata = {
-  title: 'En Palabras - Retiros',
+const metadata = {
+  title: 'En Palabras - Nueva Venta',
   description: 'Administrador de En Palabras',
 }
 

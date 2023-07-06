@@ -1,7 +1,12 @@
 import Link from 'next/link'
 import { use } from 'react'
 import { ReceivedPayment, Shipped } from './buttons'
-import { ModalEditProducts, ModalEditPayment, ModalTwoPayments } from './Modals'
+import {
+  ModalEditProducts,
+  ModalEditPayment,
+  ModalTwoPayments,
+  ModalHandleChange,
+} from './Modals'
 
 const BreadCrumbOrder = (id) => {
   return (
@@ -193,14 +198,17 @@ export default function Page({ params }) {
             </h1>
           </div>
         </div>
-        <div className="flex flex-row mt-6 pb-4 border-b">
-          <span className="text-gray-500">Fecha de compra: </span>
-          <span className="text-gray-900 ml-2 dark:text-gray-200">
-            {' '}
-            {new Date(data.order.fechaCreada).toLocaleDateString()}
-          </span>
-          <span className="text-gray-300 mx-3"> | </span>
-          <StatusInfo estado={data.order.estado} />
+        <div className="flex flex-row justify-between w-full">
+          <div className="flex flex-row mt-6 pb-4 border-b">
+            <span className="text-gray-500">Fecha de compra: </span>
+            <span className="text-gray-900 ml-2 dark:text-gray-200">
+              {' '}
+              {new Date(data.order.fechaCreada).toLocaleDateString('es-AR')}
+            </span>
+            <span className="text-gray-300 mx-3"> | </span>
+            <StatusInfo estado={data.order.estado} />
+          </div>
+          <ModalHandleChange order={data.order} />
         </div>
         <div className="flex flex-col lg:flex-row gap-2">
           <div className="flex flex-col mt-6 pb-4 border rounded-md w-full lg:w-2/3 p-4">
@@ -320,10 +328,7 @@ export default function Page({ params }) {
                 Información de Pago
               </h3>
               <div className="flex flex-row gap-4">
-                <ModalTwoPayments
-                  payment={data.order.Payments}
-                  orderId={data.order.idEP}
-                />
+                <ModalTwoPayments order={data.order} />
                 <ModalEditPayment
                   payment={data.order.Payments[0]}
                   orderId={data.order.idEP}
@@ -331,12 +336,11 @@ export default function Page({ params }) {
               </div>
             </div>
             <div className="mt-4 flex flex-col sm:flex-row justify-between h-full gap-4 md:gap-10">
-              <div className="w-full md:w-1/2 flex flex-col justify-between h-full items-center">
+              <div className="w-full md:w-1/2 flex flex-col justify-around h-full items-center">
                 <div className="flex flex-row justify-between w-full">
                   <p className="text-gray-400 text-sm ">Método de Pago</p>
                   <p className="text-gray-400 text-sm font-bold text-right">
                     {data.order.Payments[0].tipoPago}{' '}
-                    {data.order.Payments[1] && data.order.Payments[1].tipoPago}
                     {data.order.Payments[1] &&
                       `/ ${data.order.Payments[1].tipoPago}`}
                   </p>
@@ -344,35 +348,55 @@ export default function Page({ params }) {
 
                 <div className="mt-4 flex flex-row justify-between w-full items-center">
                   <p className="text-gray-400 text-sm ">Estado del Pago</p>
-                  <p
-                    className={`text-gray-400 text-sm font-bold rounded px-2 py-1
+                  <div className="flex flex-row justify-end gap-2">
+                    {data.order.Payments.map((payment) => {
+                      return (
+                        <p
+                          key={payment.id}
+                          className={`text-gray-400 text-sm font-bold rounded px-2 py-1
                     ${
-                      data.order.Payments[0].estado === 'paid' &&
+                      (payment.estado === 'paid' ||
+                        payment.estado === 'Pagado') &&
                       'bg-green-100 text-green-800 text-sm'
                     }
                      ${
-                       (data.order.Payments[0].estado === 'abandonded' ||
-                         data.order.Payments[0].estado === 'voided' ||
-                         data.order.Payments[0].estado === 'refunded') &&
+                       (payment.estado === 'abandonded' ||
+                         payment.estado === 'voided' ||
+                         payment.estado === 'refunded') &&
                        'bg-red-100 text-red-800 text-sm'
                      }
                       ${
-                        data.order.Payments[0].estado === 'pending' &&
+                        payment.estado === 'pending' &&
                         'bg-yellow-100 text-yellow-800 text-sm'
                       }
                      
                     `}
-                  >
-                    {PaymentStatus[data.order.Payments[0].estado]}
-                  </p>
+                        >
+                          {payment.estado}
+                        </p>
+                      )
+                    })}
+                  </div>
                 </div>
+
                 <div className="mt-4 flex flex-row justify-between w-full">
                   <p className="text-gray-400 text-sm ">Fecha de Pago</p>
-                  <p className="text-gray-400 text-sm font-bold text-right">
-                    {tnData.paid_at
-                      ? new Date(tnData.paid_at).toLocaleDateString()
-                      : ''}
-                  </p>
+                  <div className="flex flex-row justify-end gap-2">
+                    {data.order.Payments.map((payment, index) => {
+                      return (
+                        <p
+                          className="text-gray-400 text-sm font-bold text-right"
+                          key={index}
+                        >
+                          {payment.fechaPago
+                            ? new Date(payment.fechaPago).toLocaleDateString(
+                                'es-AR'
+                              )
+                            : ''}
+                        </p>
+                      )
+                    })}
+                  </div>
                 </div>
               </div>
               <div className="border-b border-4 sm:border sm:border-r"></div>
@@ -449,17 +473,7 @@ export default function Page({ params }) {
                   <p className="text-gray-400 font-bold break-words ">Total</p>
                   <p className="text-gray-400 text-sm font-bold">
                     ${' '}
-                    {Number(
-                      data.order.Products.reduce(
-                        (acc, product) => acc + product.precioTotal,
-                        0
-                      ) +
-                        data.order.Shipment[0].pagoEnvio -
-                        data.order.Discounts.reduce(
-                          (acc, discount) => acc + discount.montoDescuento,
-                          0
-                        )
-                    ).toLocaleString('es-AR', {
+                    {Number(data.order.montoTotal).toLocaleString('es-AR', {
                       minimumFractionDigits: 2,
                     })}
                   </p>
@@ -485,11 +499,12 @@ export default function Page({ params }) {
                   <p className="text-gray-400 text-sm">
                     ${' '}
                     {Number(
-                      data.order.Payments.filter(
-                        (payment) =>
-                          payment.estado === 'paid' ||
-                          payment.estado === 'Pagado'
-                      ).reduce((acc, payment) => acc + payment.montoTotal, 0)
+                      data.order.montoTotal -
+                        data.order.Payments.filter(
+                          (payment) =>
+                            payment.estado === 'paid' ||
+                            payment.estado === 'Pagado'
+                        ).reduce((acc, payment) => acc + payment.montoTotal, 0)
                     ).toLocaleString('es-AR', {
                       minimumFractionDigits: 2,
                     })}
@@ -499,10 +514,13 @@ export default function Page({ params }) {
             </div>
           </div>
           <div className="flex flex-col mt-6 pb-4 border rounded-md w-full lg:w-1/3 p-4">
-            <h3 className="text-lg font-semibold text-dark border-b w-full pb-2">
-              Información de Entrega
-            </h3>
-            <div className="w-full mt-4 flex flex-col justify-between h-full items-center">
+            <div className="flex flex-row justify-between border-b w-full pb-5 items-center">
+              <h3 className="text-lg font-semibold text-dark">
+                Información de Entrega
+              </h3>
+              <div className="flex flex-row gap-4"></div>
+            </div>
+            <div className="w-full mt-4 flex flex-col justify-around h-full items-center">
               <div className="flex flex-row justify-between w-full">
                 <p className="text-gray-400 text-sm ">Método de Envío</p>
                 <p className="text-gray-400 text-sm font-bold text-right">
@@ -538,7 +556,7 @@ export default function Page({ params }) {
                 <p className="text-gray-400 text-sm ">Fecha de Entrega</p>
                 <p className="text-gray-400 text-sm font-bold text-right">
                   {tnData.shipped_at
-                    ? new Date(tnData.shipped_at).toLocaleDateString()
+                    ? new Date(tnData.shipped_at).toLocaleDateString('es-AR')
                     : ''}
                 </p>
               </div>
