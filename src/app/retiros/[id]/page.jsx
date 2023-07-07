@@ -169,6 +169,8 @@ const ShipmentInfo = ({ estado }) => {
 const PaymentStatus = {
   authorized: 'Autorizado',
   pending: 'Pendiente',
+  Pagado: 'Pagado',
+  Pendiente: 'Pendiente',
   paid: 'Pagado',
   abandoned: 'Abandonado',
   refunded: 'Reintegrado',
@@ -178,6 +180,9 @@ const PaymentStatus = {
 const ShipStatus = {
   fulfilled: 'Entregado',
   shipped: 'Entregado',
+  Enviado: 'Entregado',
+  Entregado: 'Entregado',
+  Pendiente: 'Pendiente',
   unpacked: 'Pendiente',
   unfilfilled: 'Pendiente',
   unshipped: 'Pendiente',
@@ -336,21 +341,22 @@ export default function Page({ params }) {
               </div>
             </div>
             <div className="mt-4 flex flex-col sm:flex-row justify-between h-full gap-4 md:gap-10">
-              <div className="w-full md:w-1/2 flex flex-col justify-around h-full items-center">
-                <div className="flex flex-row justify-between w-full">
-                  <p className="text-gray-400 text-sm ">Método de Pago</p>
-                  <p className="text-gray-400 text-sm font-bold text-right">
-                    {data.order.Payments[0].tipoPago}{' '}
-                    {data.order.Payments[1] &&
-                      `/ ${data.order.Payments[1].tipoPago}`}
-                  </p>
-                </div>
+              {data.order.Payments.map((payment, index) => {
+                return (
+                  <div
+                    className="w-full md:w-1/2 flex flex-col justify-around h-full items-center"
+                    key={index}
+                  >
+                    <div className="flex flex-row justify-between w-full">
+                      <p className="text-gray-400 text-sm ">Método de Pago</p>
+                      <p className="text-gray-400 text-sm font-bold text-right">
+                        {payment.tipoPago}
+                      </p>
+                    </div>
 
-                <div className="mt-4 flex flex-row justify-between w-full items-center">
-                  <p className="text-gray-400 text-sm ">Estado del Pago</p>
-                  <div className="flex flex-row justify-end gap-2">
-                    {data.order.Payments.map((payment) => {
-                      return (
+                    <div className="mt-4 flex flex-row justify-between w-full items-center">
+                      <p className="text-gray-400 text-sm ">Estado del Pago</p>
+                      <div className="flex flex-row justify-end gap-2">
                         <p
                           key={payment.id}
                           className={`text-gray-400 text-sm font-bold rounded px-2 py-1
@@ -366,7 +372,8 @@ export default function Page({ params }) {
                        'bg-red-100 text-red-800 text-sm'
                      }
                       ${
-                        payment.estado === 'pending' &&
+                        (payment.estado === 'pending' ||
+                          payment.estado === 'Pendiente') &&
                         'bg-yellow-100 text-yellow-800 text-sm'
                       }
                      
@@ -374,16 +381,12 @@ export default function Page({ params }) {
                         >
                           {payment.estado}
                         </p>
-                      )
-                    })}
-                  </div>
-                </div>
+                      </div>
+                    </div>
 
-                <div className="mt-4 flex flex-row justify-between w-full">
-                  <p className="text-gray-400 text-sm ">Fecha de Pago</p>
-                  <div className="flex flex-row justify-end gap-2">
-                    {data.order.Payments.map((payment, index) => {
-                      return (
+                    <div className="mt-4 flex flex-row justify-between w-full">
+                      <p className="text-gray-400 text-sm ">Fecha de Pago</p>
+                      <div className="flex flex-row justify-end gap-2">
                         <p
                           className="text-gray-400 text-sm font-bold text-right"
                           key={index}
@@ -394,11 +397,12 @@ export default function Page({ params }) {
                               )
                             : ''}
                         </p>
-                      )
-                    })}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
+                )
+              })}
+
               <div className="border-b border-4 sm:border sm:border-r"></div>
               <div className="flex flex-col justify-between w-full md:w-1/2 gap-4">
                 <div className="flex flex-row justify-between w-full border-b pb-2">
@@ -411,7 +415,7 @@ export default function Page({ params }) {
                         0
                       )
                     ).toLocaleString('es-AR', {
-                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
                     })}
                   </p>
                 </div>
@@ -419,12 +423,14 @@ export default function Page({ params }) {
                   <p className="text-gray-400 text-sm ">Costo Envío</p>
                   <p className="text-gray-400 text-sm ">
                     ${' '}
-                    {Number(data.order.Shipment[0].pagoEnvio).toLocaleString(
-                      'es-AR',
-                      {
-                        minimumFractionDigits: 2,
-                      }
-                    )}
+                    {Number(
+                      data.order.Shipment.reduce(
+                        (acc, shipment) => acc + shipment.pagoEnvio,
+                        0
+                      )
+                    ).toLocaleString('es-AR', {
+                      maximumFractionDigits: 2,
+                    })}
                   </p>
                 </div>
                 <div className="border-b  pb-2">
@@ -443,7 +449,7 @@ export default function Page({ params }) {
                           0
                         )
                       ).toLocaleString('es-AR', {
-                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
                       })}
                       )
                     </p>
@@ -463,7 +469,7 @@ export default function Page({ params }) {
                           0
                         )
                       ).toLocaleString('es-AR', {
-                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
                       })}
                       )
                     </p>
@@ -474,7 +480,7 @@ export default function Page({ params }) {
                   <p className="text-gray-400 text-sm font-bold">
                     ${' '}
                     {Number(data.order.montoTotal).toLocaleString('es-AR', {
-                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
                     })}
                   </p>
                 </div>
@@ -490,7 +496,7 @@ export default function Page({ params }) {
                           payment.estado === 'Pagado'
                       ).reduce((acc, payment) => acc + payment.montoTotal, 0)
                     ).toLocaleString('es-AR', {
-                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
                     })}
                   </p>
                 </div>
@@ -506,7 +512,7 @@ export default function Page({ params }) {
                             payment.estado === 'Pagado'
                         ).reduce((acc, payment) => acc + payment.montoTotal, 0)
                     ).toLocaleString('es-AR', {
-                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
                     })}
                   </p>
                 </div>
@@ -520,47 +526,59 @@ export default function Page({ params }) {
               </h3>
               <div className="flex flex-row gap-4"></div>
             </div>
-            <div className="w-full mt-4 flex flex-col justify-around h-full items-center">
-              <div className="flex flex-row justify-between w-full">
-                <p className="text-gray-400 text-sm ">Método de Envío</p>
-                <p className="text-gray-400 text-sm font-bold text-right">
-                  {data.order.Shipment[0].tipoEnvio}
-                </p>
-              </div>
-              <div className="mt-4 flex flex-row justify-between w-full items-center">
-                <p className="text-gray-400 text-sm ">Estado del Envío</p>
-                <p
-                  className={`text-sm font-bold rounded px-2 py-1
+            {data.order.Shipment.map((shipment, index) => {
+              return (
+                <div
+                  className="w-full mt-4 flex flex-col justify-around h-full items-center"
+                  key={index}
+                >
+                  <div className="flex flex-row justify-between w-full">
+                    <p className="text-gray-400 text-sm ">Método de Envío</p>
+                    <p className="text-gray-400 text-sm font-bold text-right">
+                      {shipment.tipoEnvio}
+                    </p>
+                  </div>
+                  <div className="mt-4 flex flex-row justify-between w-full items-center">
+                    <p className="text-gray-400 text-sm ">Estado del Envío</p>
+                    <p
+                      className={`text-sm font-bold rounded px-2 py-1
                     ${
-                      tnData.shipping_status === 'paid' &&
+                      (shipment.estado === 'paid' ||
+                        shipment.estado === 'Enviado' ||
+                        shipment.estado === 'Entregado') &&
                       'bg-green-100 text-green-800 text-sm'
                     }
                      ${
-                       (tnData.shipping_status === 'unpacked' ||
-                         tnData.shipping_status === 'unfilfilled' ||
-                         tnData.shipping_status === 'unshipped') &&
+                       (shipment.estado === 'unpacked' ||
+                         shipment.estado === 'Pendiente' ||
+                         shipment.estado === 'unfilfilled' ||
+                         shipment.estado === 'unshipped') &&
                        'bg-blue-100 text-blue-500 text-sm'
                      }
                       ${
-                        tnData.shipping_status === 'fulfilled' ||
-                        (tnData.shipping_status === 'shipped' &&
+                        shipment.estado === 'fulfilled' ||
+                        (shipment.estado === 'shipped' &&
                           'bg-green-100 text-green-800 text-sm')
                       }
                      
                     `}
-                >
-                  {ShipStatus[tnData.shipping_status]}
-                </p>
-              </div>
-              <div className="mt-4 flex flex-row justify-between w-full">
-                <p className="text-gray-400 text-sm ">Fecha de Entrega</p>
-                <p className="text-gray-400 text-sm font-bold text-right">
-                  {tnData.shipped_at
-                    ? new Date(tnData.shipped_at).toLocaleDateString('es-AR')
-                    : ''}
-                </p>
-              </div>
-            </div>
+                    >
+                      {ShipStatus[shipment.estado]}
+                    </p>
+                  </div>
+                  <div className="mt-4 flex flex-row justify-between w-full">
+                    <p className="text-gray-400 text-sm ">Fecha de Entrega</p>
+                    <p className="text-gray-400 text-sm font-bold text-right">
+                      {shipment.fechaEnvio
+                        ? new Date(shipment.fechaEnvio).toLocaleDateString(
+                            'es-AR'
+                          )
+                        : ''}
+                    </p>
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </div>
 
@@ -584,7 +602,7 @@ export default function Page({ params }) {
                   </span>
                 ) : (
                   <ReceivedPayment
-                    defaultAmount={data.order.Payments[0].montoTotal}
+                    defaultAmount={data.order.montoTotal}
                     paymentId={data.order.Payments[0].id}
                     externalId={data.order.externalId}
                   />
@@ -598,7 +616,9 @@ export default function Page({ params }) {
               </h3>
 
               <div className="mt-2 flex flex-row justify-between items-center h-full">
-                {tnData.shipping_status === 'shipped' ? (
+                {data.order.Shipment[0] === 'shipped' ||
+                data.order.Shipment[0] === 'Entregado' ||
+                data.order.Shipment[0] === 'Enviado' ? (
                   <span
                     className="text-gray-400 text-sm mx-auto font-bold rounded px-2 py-1 
                         bg-green-100 text-green-800 text-sm"

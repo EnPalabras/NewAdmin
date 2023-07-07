@@ -30,7 +30,7 @@ const productsList = [
     'Año Nuevo': {
       categoria: 'Juegos',
       variante: ['Unica'],
-      precio: 3950,
+      precio: 3590, // modificar
     },
   },
   {
@@ -401,7 +401,7 @@ export function ModalEditProducts({ data, orderId }) {
                         //   )[productData[index].producto].precio
                         // }
                         value={product.precioUnitario}
-                        onBlur={(e) => {
+                        onChange={(e) => {
                           const newProductData = [...productData]
                           newProductData[index].precioUnitario = e.target.value
                           newProductData[index].precioTotal =
@@ -580,6 +580,22 @@ export function ModalTwoPayments({ order }) {
             </p>
           </div>
           <div className="flex flex-col w-full justify-between items-center gap-4">
+            <Button
+              onClick={() => {
+                const newPayments = [...payments]
+                newPayments.push({
+                  estado: 'pending',
+                  tipoPago: 'Efectivo',
+                  cuentaDestino: 'Callipsian Recoleta',
+                  montoTotal: 0,
+                  montoRecibido: 0,
+                })
+                setPayments(newPayments)
+              }}
+              className="w-1/3 mx-auto py-2 border-radius-2xl "
+            >
+              Agregar Pago
+            </Button>
             {payments.map((payment, index) => (
               <div
                 className="flex flex-row w-full justify-between gap-4 items-center"
@@ -592,7 +608,8 @@ export function ModalTwoPayments({ order }) {
                   <p
                     className={`text-gray-400 text-sm font-bold rounded  px-2 py-2.5 text-center
                     ${
-                      payment.estado === 'paid' &&
+                      (payment.estado === 'paid' ||
+                        payment.estado === 'Pagado') &&
                       'bg-green-100 text-green-800 text-sm'
                     }
                      ${
@@ -602,7 +619,8 @@ export function ModalTwoPayments({ order }) {
                        'bg-red-100 text-red-800 text-sm'
                      }
                       ${
-                        payment.estado === 'pending' &&
+                        (payment.estado === 'pending' ||
+                          payment.estado === 'Pendiente') &&
                         'bg-yellow-100 text-yellow-800 text-sm'
                       }
                      
@@ -683,22 +701,6 @@ export function ModalTwoPayments({ order }) {
               </div>
             ))}
             <div className="w-full flex flex-row justify-between items-center">
-              <Button
-                onClick={() => {
-                  const newPayments = [...payments]
-                  newPayments.push({
-                    estado: 'pending',
-                    tipoPago: 'Efectivo',
-                    cuentaDestino: 'Callipsian Recoleta',
-                    montoTotal: 0,
-                    montoRecibido: 0,
-                  })
-                  setPayments(newPayments)
-                }}
-                className="w-1/3 mx-auto py-2 border-radius-2xl "
-              >
-                Agregar Pago
-              </Button>
               <div className="w-full flex flex-col justify-end">
                 <div className="w-full flex flex-row justify-end">
                   <p className="text-black text-md font-bold rounded  px-2 py-1 text-center">
@@ -724,6 +726,23 @@ export function ModalTwoPayments({ order }) {
                     ${' '}
                     {order.montoTotal.toLocaleString('es-AR', {
                       minimumFractionDigits: 2,
+                    })}
+                  </p>
+                </div>
+                <div className="w-full flex flex-row justify-end">
+                  <p className="text-black text-md font-bold rounded  px-2 py-1 text-center">
+                    Restante
+                  </p>
+                  <p className="text-black text-md font-bold rounded  px-2 py-1 text-center">
+                    ${' '}
+                    {(
+                      order.montoTotal -
+                      payments.reduce(
+                        (acc, payment) => acc + parseFloat(payment.montoTotal),
+                        0
+                      )
+                    ).toLocaleString('es-AR', {
+                      maximumFractionDigits: 2,
                     })}
                   </p>
                 </div>
@@ -916,6 +935,8 @@ const PaymentStatus = {
   authorized: 'Autorizado',
   pending: 'Pendiente',
   paid: 'Pagado',
+  Pendiente: 'Pendiente',
+  Pagado: 'Pagado',
   abandoned: 'Abandonado',
   refunded: 'Reintegrado',
   voided: 'Rechazado',
