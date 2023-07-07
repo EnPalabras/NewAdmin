@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 export default function Login() {
   const [inputs, setInputs] = useState({
@@ -120,12 +121,12 @@ export default function Login() {
 
               <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                 ¿No tienes cuenta?{' '}
-                <a
-                  href="#"
+                <Link
+                  href="/register"
                   className="font-medium text-primary-600 hover:underline dark:text-primary-500"
                 >
                   Registrarme
-                </a>
+                </Link>
               </p>
               {error && (
                 <div
