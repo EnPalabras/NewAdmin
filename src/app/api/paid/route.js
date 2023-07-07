@@ -3,13 +3,12 @@ import { revalidatePath } from 'next/cache'
 
 export async function POST(request) {
   const { paymentId, date, amountReceived, externalId } = await request.json()
-
-  revalidatePath('/retiros/[id]')
-  revalidatePath('/retiros')
-
   const data = await markOrderAsPaid(paymentId, date, amountReceived)
   await markPaidInTN(externalId, date, amountReceived)
   await markPaidInTN(externalId, date, amountReceived)
+
+  revalidatePath('/retiros/[id]')
+  revalidatePath('/retiros')
 
   return NextResponse.json(data)
 }

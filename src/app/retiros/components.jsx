@@ -67,6 +67,8 @@ const canalColors = {
   Regalo: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
   unshipped: 'bg-primary-100 text-primary-800 ',
   shipped: 'bg-green-500 text-white ',
+  Entregado: 'bg-green-500 text-white ',
+  Enviado: 'bg-green-500 text-white ',
 }
 
 const useSalesData = (pagination, search) => {
@@ -303,7 +305,9 @@ export default function LocalSales() {
                           'bg-primary-100 text-primary-800 '
                         } text-sm whitespace-nowrap font-medium px-2 py-1 text-center rounded `}
                       >
-                        {sale.Shipment[0].estado === 'shipped'
+                        {sale.Shipment[0].estado === 'shipped' ||
+                        sale.Shipment[0].estado === 'Entregado' ||
+                        sale.Shipment[0].estado === 'Enviado'
                           ? 'Entregado'
                           : 'Entrega Pendiente'}
                       </span>

@@ -2,15 +2,39 @@ import { NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
 
 export async function POST(request) {
-  const { externalId } = await request.json()
+  const { externalId, orderId, date } = await request.json()
 
   const path = request.nextUrl.searchParams.get('path') || '/'
-  revalidatePath('/retiros/[id]')
-  revalidatePath('/retiros')
+  console.log('path', path)
 
   const data = await deliverOrder(externalId)
+  const delivered = await markOrderAsDelivered(orderId, date)
+
+  revalidatePath('/retiros/[id]')
+  revalidatePath('/retiros')
+  revalidatePath(`/retiros/${orderId}`)
+
+  revalidatePath(path)
 
   return NextResponse.json(data)
+}
+
+const markOrderAsDelivered = async (orderId, date) => {
+  const body = {
+    date,
+  }
+
+  const headers = {
+    'Content-Type': 'application/json',
+  }
+  const URL = `https://serverep-production.up.railway.app/api/ventas/order/delivered/${orderId}`
+  const res = await fetch(URL, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(body),
+  })
+
+  const data = await res.json()
 }
 
 const deliverOrder = async (externalId) => {

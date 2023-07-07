@@ -616,9 +616,9 @@ export default function Page({ params }) {
               </h3>
 
               <div className="mt-2 flex flex-row justify-between items-center h-full">
-                {data.order.Shipment[0] === 'shipped' ||
-                data.order.Shipment[0] === 'Entregado' ||
-                data.order.Shipment[0] === 'Enviado' ? (
+                {data.order.Shipment[0].estado === 'shipped' ||
+                data.order.Shipment[0].estado === 'Entregado' ||
+                data.order.Shipment[0].estado === 'Enviado' ? (
                   <span
                     className="text-gray-400 text-sm mx-auto font-bold rounded px-2 py-1 
                         bg-green-100 text-green-800 text-sm"
@@ -626,7 +626,10 @@ export default function Page({ params }) {
                     Entregada
                   </span>
                 ) : (
-                  <Shipped externalId={data.order.externalId} />
+                  <Shipped
+                    externalId={data.order.externalId}
+                    orderId={data.order.idEP}
+                  />
                 )}
               </div>
             </div>
@@ -644,6 +647,7 @@ async function getData(id) {
       next: {
         cache: 'no-cache',
         tags: ['actualizar'],
+        revalidate: 60,
       },
     }
   )

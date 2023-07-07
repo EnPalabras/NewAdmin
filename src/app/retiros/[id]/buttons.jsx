@@ -115,7 +115,7 @@ export function ReceivedPayment({ defaultAmount, paymentId, externalId }) {
   )
 }
 
-export function Shipped({ externalId }) {
+export function Shipped({ externalId, orderId }) {
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10))
   const [loading, setLoading] = useState(false)
   const handleDateChange = (value) => {
@@ -130,11 +130,18 @@ export function Shipped({ externalId }) {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ externalId }),
+      body: JSON.stringify({
+        externalId,
+        orderId,
+        date: new Date(),
+      }),
     })
 
     if (response.ok) {
-      window.location.reload()
+      console.log('okkkkkk')
+      setTimeout(() => {
+        window.location.reload()
+      }, 1000)
     }
 
     setLoading(false)

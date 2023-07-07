@@ -510,6 +510,10 @@ export function ModalTwoPayments({ order }) {
   const [payments, setPayments] = useState([...order.Payments])
   const props = { openModal, setOpenModal }
   const [comentarios, setComentarios] = useState('')
+  const [cobroYVuelto, setCobroYVuelto] = useState({
+    cobro: 0,
+    vuelto: 0,
+  })
 
   const PaymentTypes = [
     { Efectivo: 'Callipsian Recoleta' },
@@ -802,6 +806,19 @@ export function ModalHandleChange({ order }) {
   const [originalProducts, setOriginalProducts] = useState([...order.Products])
   const [products, setProducts] = useState([])
 
+  const [newProducts, setNewProducts] = useState(
+    productsList.map((product) => ({
+      checked: false,
+      producto: Object.keys(product)[0],
+      cantidad: 1,
+      precioUnitario: product[Object.keys(product)[0]].precio,
+      variante: product[Object.keys(product)[0]].variante[0],
+      precioTotal: product[Object.keys(product)[0]].precio,
+      categoria: product[Object.keys(product)[0]].categoria,
+      moneda: 'ARS',
+    }))
+  )
+
   return (
     <>
       <Button
@@ -812,6 +829,7 @@ export function ModalHandleChange({ order }) {
       </Button>
       <Modal
         dismissible
+        size={'4xl'}
         show={props.openModal === 'dismissible'}
         onClose={() => props.setOpenModal(undefined)}
       >
@@ -822,7 +840,6 @@ export function ModalHandleChange({ order }) {
               Utilizar esta opción en caso de que un cliente que ya haya
               retirado su pedido quiera cambiar algún producto.
             </p>
-            {JSON.stringify(products)}
             <div className="flex flex-col w-full  pl-2 justify-between  gap-4">
               <p className=" text-left">Productos disponibles para Cambiar</p>
 
@@ -885,6 +902,7 @@ export function ModalHandleChange({ order }) {
                             newProducts[index].cantidad = e.target.value
                             newProducts[index].precioTotal =
                               e.target.value * product.precioUnitario
+
                             setProducts(newProducts)
                           }}
                         />
@@ -896,20 +914,117 @@ export function ModalHandleChange({ order }) {
                   ))}
                 </Table.Body>
               </Table>
-              <div className="flex flex-end w-full">
-                <p className="text-black text-md font-bold rounded  px-2 py-1 text-right">
+
+              <h3>Nuevos Productos</h3>
+
+              <Table>
+                <Table.Head>
+                  <Table.HeadCell className="p-4">
+                    <Checkbox disabled />
+                  </Table.HeadCell>
+                  <Table.HeadCell>Producto</Table.HeadCell>
+                  <Table.HeadCell>Variante</Table.HeadCell>
+                  <Table.HeadCell>Cantidad</Table.HeadCell>
+                  <Table.HeadCell>Precio</Table.HeadCell>
+                </Table.Head>
+
+                <Table.Body className="divide-y divide-gray-200">
+                  {newProducts.map((product, index) => (
+                    <Table.Row key={index}>
+                      <Table.Cell className="p-4">
+                        <Checkbox
+                          id={product.producto}
+                          className="w-4 h-4 text-gray-800 dark:text-white"
+                          value={product.producto}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              const editedProducts = [...newProducts]
+                              editedProducts[index].checked = true
+                              setNewProducts(editedProducts)
+                            } else {
+                              const editedProducts = [...newProducts]
+                              editedProducts[index].checked = false
+                              setNewProducts(editedProducts)
+                            }
+                          }}
+                        />
+                      </Table.Cell>
+                      <Table.Cell>{product.producto}</Table.Cell>
+                      <Table.Cell>
+                        <Select
+                          id="variante"
+                          className="px-0.5 py-0"
+                          required
+                          value={product.variante}
+                          onChange={(e) => {
+                            const editedProducts = [...newProducts]
+                            editedProducts[index].variante = e.target.value
+                            setNewProducts(editedProducts)
+                          }}
+                        >
+                          {product.producto === 'Desconectados' ||
+                          product.producto === 'Destapados' ||
+                          product.producto === 'Año Nuevo' ? (
+                            <option>{product.variante}</option>
+                          ) : (
+                            <>
+                              <option>Talle 1</option>
+                              <option>Talle 2</option>
+                              <option>Talle 3</option>
+                            </>
+                          )}
+                        </Select>
+
+                        {/* 
+                        {product[Object.keys(product)[0]].variante.map(
+                          (variante) => (
+                            <p key={variante}>{variante}</p>
+                          )
+                        )} */}
+                      </Table.Cell>
+                      <Table.Cell>
+                        <input
+                          type="number"
+                          className="w-20 h-8 text-gray-800 text-center dark:text-white border border-gray-300 dark:border-gray-700 rounded-md shadow-sm "
+                          defaultValue={product.cantidad}
+                          onChange={(e) => {
+                            const editedProducts = [...newProducts]
+                            editedProducts[index].cantidad = e.target.value
+                            editedProducts[index].precioTotal =
+                              e.target.value * product.precioUnitario
+
+                            setNewProducts(editedProducts)
+                          }}
+                        />
+                      </Table.Cell>
+                      <Table.Cell className="text-sm">
+                        {<p className="">$ {product.precioUnitario}</p>}
+                      </Table.Cell>
+                    </Table.Row>
+                  ))}
+                </Table.Body>
+              </Table>
+            </div>
+            <p className="text-gray-600 text-sm rounded mb-4 w-full text-center">
+              El crédito se calcula con los precios actuales de los productos.
+              En caso de cambiar un producto con el mismo precio (por ejemplo
+              Remeras o Desconectados/Destapados) se puede hacer el cambio sin
+              costo extra.
+            </p>
+          </div>
+
+          <div className="flex flex-col w-full justify-between">
+            <div className="flex flex-row justify-between w-full">
+              <div className="flex w-full">
+                <p className="text-black text-md font-bold rounded text-right px-2 py-1 text-end">
                   Crédito Total ${' '}
                   {(
-                    order.Payments.reduce(
-                      (acc, payment) => acc + parseFloat(payment.montoTotal),
+                    products.reduce(
+                      (acc, product) => acc + parseFloat(product.precioTotal),
                       0
                     ) -
                     order.Shipment.reduce(
                       (acc, shipment) => acc + parseFloat(shipment.pagoEnvio),
-                      0
-                    ) -
-                    products.reduce(
-                      (acc, product) => acc + parseFloat(product.precioTotal),
                       0
                     )
                   ).toLocaleString('es-AR', {
@@ -917,6 +1032,97 @@ export function ModalHandleChange({ order }) {
                   })}
                 </p>
               </div>
+              <div className="flex w-full">
+                <p className="text-black text-md font-bold rounded text-right px-2 py-1 text-end">
+                  Nuevos Productos ${' '}
+                  {newProducts
+                    .filter((product) => product.checked === true)
+                    .reduce(
+                      (acc, product) => acc + parseFloat(product.precioTotal),
+                      0
+                    )
+                    .toLocaleString('es-AR', {
+                      maximumFractionDigits: 2,
+                    })}
+                </p>
+              </div>
+            </div>
+            <div className="mt-8">
+              <h1
+                className="text-center  text-2xl font-bold
+              "
+              >
+                Saldo
+              </h1>
+              {products.reduce(
+                (acc, product) => acc + parseFloat(product.precioTotal),
+                0
+              ) -
+                order.Shipment.reduce(
+                  (acc, shipment) => acc + parseFloat(shipment.pagoEnvio),
+                  0
+                ) -
+                newProducts
+                  .filter((product) => product.checked === true)
+                  .reduce(
+                    (acc, product) => acc + parseFloat(product.precioTotal),
+                    0
+                  ) >
+              0 ? (
+                <p className="text-center text-2xl font-bold text-green-500">
+                  ${' '}
+                  {(
+                    products.reduce(
+                      (acc, product) => acc + parseFloat(product.precioTotal),
+                      0
+                    ) -
+                    order.Shipment.reduce(
+                      (acc, shipment) => acc + parseFloat(shipment.pagoEnvio),
+                      0
+                    ) -
+                    newProducts
+                      .filter((product) => product.checked === true)
+                      .reduce(
+                        (acc, product) => acc + parseFloat(product.precioTotal),
+                        0
+                      )
+                  ).toLocaleString('es-AR', {
+                    maximumFractionDigits: 2,
+                  })}{' '}
+                  a favor del cliente
+                </p>
+              ) : (
+                <p className="text-center text-2xl font-bold text-red-500">
+                  ${' '}
+                  {(
+                    products.reduce(
+                      (acc, product) => acc + parseFloat(product.precioTotal),
+                      0
+                    ) -
+                    order.Shipment.reduce(
+                      (acc, shipment) => acc + parseFloat(shipment.pagoEnvio),
+                      0
+                    ) -
+                    newProducts
+                      .filter((product) => product.checked === true)
+                      .reduce(
+                        (acc, product) => acc + parseFloat(product.precioTotal),
+                        0
+                      )
+                  ).toLocaleString('es-AR', {
+                    maximumFractionDigits: 2,
+                  })}{' '}
+                  debe el cliente
+                </p>
+              )}
+            </div>
+            <div className="mt-8">
+              <Textarea
+                placeholder="Observaciones"
+                // value={comentarios}
+                defaultValue={comentarios}
+                onBlur={(e) => setComentarios(e.target.value)}
+              />
             </div>
           </div>
         </Modal.Body>
