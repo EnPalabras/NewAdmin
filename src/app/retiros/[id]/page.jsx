@@ -379,7 +379,10 @@ export default function Page({ params }) {
                      
                     `}
                         >
-                          {payment.estado}
+                          {payment.estado === 'paid' ||
+                          payment.estado === 'Pagado'
+                            ? 'Pagado'
+                            : payment.estado}
                         </p>
                       </div>
                     </div>
