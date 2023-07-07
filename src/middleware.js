@@ -28,7 +28,7 @@ export async function middleware(request) {
     pathname !== '/retiros' &&
     !pathname.includes('/retiros')
   ) {
-    if (token && token.email === 'entregas@gmail.com') {
+    if (token && token.email === 'retirosep@gmail.com') {
       console.log('token.email', token.email)
       const url = new URL(`/retiros`, request.url)
       return NextResponse.redirect(url)
