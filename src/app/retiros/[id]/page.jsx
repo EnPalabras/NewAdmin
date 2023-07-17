@@ -99,6 +99,10 @@ const StatusInfo = ({ estado }) => {
         'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
       circle: 'bg-green-500',
     },
+    Cancelada: {
+      color: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
+      circle: 'bg-red-500',
+    },
   }
 
   return (
