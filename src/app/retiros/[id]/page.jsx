@@ -57,6 +57,8 @@ const BreadCrumbOrder = (id) => {
 }
 
 const ProductImage = {
+  'Kit Desconectados + Destapados':
+    'https://d3ugyf2ht6aenh.cloudfront.net/stores/001/705/915/products/l0irng-760e4ae89c08ef82a616899565771173-1024-1024.png',
   Desconectados:
     'https://d3ugyf2ht6aenh.cloudfront.net/stores/001/705/915/products/juego-para-familias1-e967b8ecf1aad2e0bf16728584939231-1024-1024.webp',
   Destapados:
