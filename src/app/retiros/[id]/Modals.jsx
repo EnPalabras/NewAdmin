@@ -16,21 +16,21 @@ const productsList = [
     Desconectados: {
       categoria: 'Juegos',
       variante: ['Unica'],
-      precio: 7830,
+      precio: 8999,
     },
   },
   {
     Destapados: {
       categoria: 'Juegos',
       variante: ['Unica'],
-      precio: 7830,
+      precio: 8999,
     },
   },
   {
     'Año Nuevo': {
       categoria: 'Juegos',
       variante: ['Unica'],
-      precio: 3590, // modificar
+      precio: 4495, // modificar
     },
   },
   {

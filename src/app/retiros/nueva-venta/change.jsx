@@ -8,21 +8,21 @@ const productsList = [
     Desconectados: {
       categoria: 'Juegos',
       variante: ['Unica'],
-      precio: 7830,
+      precio: 8999,
     },
   },
   {
     Destapados: {
       categoria: 'Juegos',
       variante: ['Unica'],
-      precio: 7830,
+      precio: 8999,
     },
   },
   {
     'Año Nuevo': {
       categoria: 'Juegos',
       variante: ['Unica'],
-      precio: 3950,
+      precio: 4495,
     },
   },
   {
@@ -119,12 +119,6 @@ export default function ChangeProducts() {
   const submitSale = async () => {
     setLoading(true)
 
-    console.log(
-      productsList.find(
-        (product) => Object.keys(product)[0] === 'Desconectados'
-      )['Desconectados'].precio
-    )
-
     const body = {
       nombre: orderInfo.nombre,
       idEP: `LO-${Date.now()}`,
@@ -179,9 +173,6 @@ export default function ChangeProducts() {
     }
 
     setLoading(false)
-    console.log({ body })
-
-    return
 
     const response = await fetch('/api/orders', {
       method: 'POST',
@@ -197,7 +188,6 @@ export default function ChangeProducts() {
 
     const json = await response.json()
     // setError(true)
-    props.setOpenModal(undefined)
     setLoading(false)
   }
 
