@@ -18,8 +18,6 @@ export default function CargarMayorista() {
   const [error, setError] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  console.log(inputs)
-
   const {
     nombre,
     CUIT,
@@ -66,7 +64,6 @@ export default function CargarMayorista() {
       )
       if (!response.ok) {
         setError(`Ocurrió un Error: Código ${response.status}`)
-        console.log(response)
         return
       }
       const parseRes = await response.json()
@@ -78,6 +75,7 @@ export default function CargarMayorista() {
       }, 1000)
     } finally {
       setLoading(false)
+      window.location.href = '/mayoristas'
     }
   }
 
